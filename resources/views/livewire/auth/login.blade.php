@@ -6,7 +6,7 @@
                 <div class="col-12 col-md-6 col-xl-6">
                     <div class="d-flex">
                         <div class="col-12 col-xl-9">
-                            <img class="img-fluid rounded mb-4" loading="lazy" src="{{ asset('assets/img/paud.png') }}"
+                            <img class="img-fluid rounded mb-4" loading="lazy" src="{{ asset('assets/images/paud.png') }}"
                                 width="100" height="80" alt="BootstrapBrain Logo">
                             <hr class="border-primary-subtle mb-4">
                             <h2 class="h1 mb-4">Untuk Senyum Kecil Hari Ini dan Masa Depan yang Cerah</h2>
@@ -33,18 +33,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <form action="#!">
+                            <form wire:submit.prevent="login">
                                 <div class="row gy-3 overflow-hidden">
                                     <div class="col-12">
                                         <div class="form-floating">
-                                            <input type="email" class="form-control" name="email" id="email"
+                                            <input type="email" wire:model='email' class="form-control" name="email" id="email"
                                                 placeholder="name@example.com" required>
                                             <label for="email" class="form-label">Email</label>
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <div class="form-floating mb-3">
-                                            <input type="password" class="form-control" name="password" id="password"
+                                            <input type="password" wire:model='password' class="form-control" name="password" id="password"
                                                 value="" placeholder="Password" required>
                                             <label for="password" class="form-label">Password</label>
                                         </div>
