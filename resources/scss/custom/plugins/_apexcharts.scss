@@ -1,0 +1,56 @@
+
+//
+// apexcharts.scss
+//
+.apex-charts {
+    min-height: 10px !important;
+    text {
+        font-family: $font-family-base !important;
+        fill: $gray-500;
+        font-weight: 400;
+    }
+    .apexcharts-canvas {
+        margin: 0 auto;
+    }
+}
+
+.apexcharts-tooltip{
+    background-color: var(--#{$prefix}white) !important;
+    border-color: var(--#{$prefix}border-color) !important;
+}
+.apexcharts-tooltip-title{
+    background: var(--#{$prefix}light) !important;
+    border-color: var(--#{$prefix}border-color) !important;
+}
+.apexcharts-tooltip-title,
+.apexcharts-tooltip-text {
+    font-family: $font-family-base !important;
+}
+
+.apexcharts-legend-series {
+    font-weight: $font-weight-medium;
+}
+
+.apexcharts-gridline {
+    pointer-events: none;
+    stroke: $apex-grid-color;
+}
+
+.apexcharts-legend-text {
+    color: var(--#{$prefix}gray-600) !important;
+    font-family: $font-family-base !important;
+    font-size: 13px !important;
+    font-weight: $font-weight-medium !important;
+}
+
+.apexcharts-pie-label {
+    fill: $white !important;
+}
+
+.apexcharts-yaxis,
+.apexcharts-xaxis {
+    text {
+        font-family: $font-family-base !important;
+        fill: var(--#{$prefix}gray-500);
+    }
+}

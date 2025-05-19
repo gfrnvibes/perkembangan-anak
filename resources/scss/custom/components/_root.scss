@@ -1,0 +1,168 @@
+// 
+// root.scss
+//
+
+@mixin color-mode($mode: light, $root: false) {
+    @if $color-mode-type =="media-query" {
+        @if $root ==true {
+            @media (prefers-color-scheme: $mode) {
+                :root {
+                    @content;
+                }
+            }
+        }
+
+        @else {
+            @media (prefers-color-scheme: $mode) {
+                @content;
+            }
+        }
+    }
+
+    @else {
+        [data-bs-theme="#{$mode}"] {
+            @content;
+        }
+    }
+}
+
+//theme-light
+:root,
+[data-bs-theme="light"] {
+    --#{$prefix}header-bg:                                #{$white};
+    --#{$prefix}header-item-color:                        #{$header-item-color};
+    --#{$prefix}header-item-sub-color:                    #{$text-muted};
+    --#{$prefix}sidebar-bg:                               #{$white};
+
+
+    // Topbar User
+    --#{$prefix}topbar-user-bg:                           #{$gray-100};
+
+    // Horizontal nav
+    --#{$prefix}topnav-bg:                                #{$white};
+    --#{$prefix}topnav-item-color:                        #{darken($gray-600, 10%)};
+    --#{$prefix}topnav-item-color-active:                 var(--#{$prefix}primary);
+
+      // twocolumn menu
+    --#{$prefix}twocolumn-menu-iconview-bg:               #{$white};
+    --#{$prefix}twocolumn-menu-bg:                        #{$white};
+ 
+    --#{$prefix}alert-border-color:                       #{$gray-200};
+    --#{$prefix}list-group-color:                         #{$gray-700};
+
+    --#{$prefix}toast-background-color:                   #{$white};
+    --#{$prefix}toast-border-color:                       #{$gray-300};
+
+    --#{$prefix}input-bg:                                 #{$white};
+    --#{$prefix}input-focus-border-color:                 #{$blue-200};
+    --#{$prefix}input-border-color:                       #{$gray-400};
+
+    --#{$prefix}menu-item-color:                          #7b8190;
+
+    --#{$prefix}sidebar-bg:                             #ffffff;
+    --#{$prefix}sidebar-menu-item-color:                #7b8190;
+    --#{$prefix}sidebar-menu-sub-item-color:            #7b8190;
+    --#{$prefix}sidebar-menu-item-icon-color:           #7b8190;
+    --#{$prefix}sidebar-menu-item-hover-color:          #383c40;
+    --#{$prefix}sidebar-menu-item-active-color:         #5b73e8;
+    --#{$prefix}sidebar-menu-item-active-bg-color:      #f3f8fb;
+
+    [data-sidebar="dark"]{
+        --#{$prefix}sidebar-dark-bg:                            #1c2742;
+        --#{$prefix}sidebar-dark-menu-item-color:               #898fa9;
+        --#{$prefix}sidebar-dark-menu-sub-item-color:           #7b8198;
+        --#{$prefix}sidebar-dark-menu-item-icon-color:          #666b7f;
+        --#{$prefix}sidebar-dark-menu-item-hover-color:         #{$white};
+        --#{$prefix}sidebar-dark-menu-item-active-color:        #{$white};
+        --#{$prefix}sidebar-menu-item-active-bg-color-dark:     #343747;
+        --#{$prefix}sidebar-menu-item-active-bg-color:          #1c2742;
+    }
+
+
+    [data-sidebar="colored"] {
+        --#{$prefix}vertical-menu-bg:                         #{$blue-700};
+        --#{$prefix}vertical-menu-border:                     #{$blue-700};
+        --#{$prefix}vertical-menu-item-color:                 #a5bad9;
+        --#{$prefix}vertical-menu-item-hover-color:           #{$white};
+        --#{$prefix}vertical-menu-item-hover-bg:              #1c2932;
+        --#{$prefix}vertical-menu-item-active-color:          #{$white};
+        --#{$prefix}vertical-menu-sub-item-color:             #a5bad9;
+        --#{$prefix}vertical-menu-sub-item-hover-color:       #{$white};
+        --#{$prefix}vertical-menu-sub-item-active-color:      #{$white};
+        --#{$prefix}vertical-menu-title-color:                #a5bad9;
+    }
+}
+
+    [data-topbar="dark"] {
+        --#{$prefix}header-bg:                            #2f374e;
+        --#{$prefix}header-item-color:                    #{$gray-100};
+        --#{$prefix}header-item-sub-color:                #8795ab;
+    }
+
+//theme dark
+@if $enable-dark-mode {
+    @include color-mode(dark, true) {
+        --#{$prefix}light:                     #{$light-dark};
+        --#{$prefix}light-rgb:                  #{to-rgb($light-dark)};
+        --#{$prefix}dark:                       #{$light-dark};
+        --#{$prefix}dark-rgb:                   #{to-rgb($light-dark)};
+        --#{$prefix}header-item-color:          #{$header-item-color-dark};
+        --#{$prefix}menu-item-color:            #{$menu-item-color-dark};
+
+        --#{$prefix}header-bg:                                #2d313e;
+
+        --#{$prefix}topnav-bg:                                #303442;
+
+        --#{$prefix}input-bg:                                  #{$body-tertiary-bg-dark};  
+        --#{$prefix}boxed-body-bg:                             #212124; 
+
+       &[data-sidebar="light"]{
+            --#{$prefix}sidebar-bg:                             #ffffff;
+            --#{$prefix}sidebar-menu-item-color:                #7b8190;
+            --#{$prefix}sidebar-menu-sub-item-color:            #7b8190;
+            --#{$prefix}sidebar-menu-item-icon-color:           #7b8190;
+            --#{$prefix}sidebar-menu-item-hover-color:          #383c40;
+            --#{$prefix}sidebar-menu-item-active-color:         #5b73e8;
+            --#{$prefix}sidebar-menu-item-active-bg-color:      #f3f8fb;
+       }
+
+            --#{$prefix}sidebar-bg:                                 #2b2e3b;
+            --#{$prefix}sidebar-menu-item-color:                    #898fa9;
+            --#{$prefix}sidebar-menu-sub-item-color:                #7b8198;
+            --#{$prefix}sidebar-menu-item-icon-color:               #666b7f;
+            --#{$prefix}sidebar-menu-item-hover-color:              #{$white};
+            --#{$prefix}sidebar-menu-item-active-color:             #{$white};
+            --#{$prefix}sidebar-menu-item-active-bg-color:          #293552;
+
+
+        
+
+        &[data-sidebar="dark"]{
+            --#{$prefix}sidebar-dark-bg:                                 #2b2e3b;
+            --#{$prefix}sidebar-dark-menu-item-color:                    #898fa9;
+            --#{$prefix}sidebar-dark-menu-sub-item-color:                #7b8198;
+            --#{$prefix}sidebar-dark-menu-item-icon-color:               #666b7f;
+            --#{$prefix}sidebar-dark-menu-item-hover-color:              #{$white};
+            --#{$prefix}sidebar-dark-menu-item-active-color:             #{$white};
+            --#{$prefix}sidebar-dark-menu-item-active-bg-color:          #293552;
+        }
+
+        .table-light {
+            --bs-table-color:                       #{$white};
+            --bs-table-bg:                          var(--#{$prefix}light);
+            --bs-table-border-color:                var(--#{$prefix}border-color);
+            --bs-table-striped-bg:                  var(--#{$prefix}light);
+            --bs-table-striped-color:               #{lighten($light-dark, 100%)};
+            --bs-table-active-bg:                   var(--#{$prefix}light);
+            --bs-table-active-color:                #{lighten($light-dark, 100%)};
+            --bs-table-hover-bg:                    var(--#{$prefix}light);
+            --bs-table-hover-color:                 #{lighten($light-dark, 100%)};
+        }
+
+        &[data-topbar="light"] {
+            --#{$prefix}header-bg:  #{$white};
+            --#{$prefix}header-item-color:   #{$header-item-color};
+            --#{$prefix}header-item-sub-color: #8795ab;
+        }
+    }
+}

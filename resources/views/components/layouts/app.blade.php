@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
 
     {{-- Icon --}}
-    <link rel="shortcut icon" href="{{ asset('assets/img/paud.png') }}">
+    <link rel="shortcut icon" href="{{ asset('assets/images/paud.png') }}">
 
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">

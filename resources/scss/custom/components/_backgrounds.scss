@@ -1,0 +1,12 @@
+// 
+// backgrounds.scss
+//
+
+
+@each $color,
+$value in $theme-colors {
+    .bg-gradient-#{$color} {
+        background: linear-gradient( to bottom, ($value), rgba(($value), 0.5))!important;
+    }
+}
+

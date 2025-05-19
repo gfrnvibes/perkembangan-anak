@@ -1,0 +1,165 @@
+//
+// Form editors.scss
+//
+
+// Tinymce
+
+.tox-tinymce {
+  border: 1px solid var(--#{$prefix}border-color) !important;
+}
+
+.tox {
+  .tox-statusbar {
+    border-top: 1px solid var(--#{$prefix}border-color) !important;
+  }
+  .tox-menubar,
+  .tox-edit-area__iframe,
+  .tox-statusbar {
+    background-color: var(--#{$prefix}secondary-bg) !important;
+    background: none !important;
+  }
+  .tox-mbtn {
+    color: var(--#{$prefix}body-color) !important;
+    &:hover:not(:disabled):not(.tox-mbtn--active) {
+      background-color: var(--#{$prefix}tertiary-bg) !important;
+    }
+  }
+  .tox-tbtn {
+    &:hover {
+      background-color: var(--#{$prefix}tertiary-bg) !important;
+    }
+  }
+
+  .tox-toolbar,
+  .tox-toolbar__overflow,
+  .tox-toolbar__primary {
+    background: var(--#{$prefix}tertiary-bg) !important;
+  }
+
+  .tox-toolbar__primary {
+    border-top-color: var(--#{$prefix}border-color) !important;
+  }
+
+  .tox-tbtn {
+    color: var(--#{$prefix}body-color) !important;
+    svg {
+      fill: var(--#{$prefix}body-color) !important;
+    }
+  }
+
+  .tox-edit-area{
+    background-color: var(--#{$prefix}secondary-bg) !important;
+    .tox-edit-area__iframe {
+      background-color: var(--#{$prefix}secondary-bg) !important;
+    }
+  }
+
+  .tox-statusbar a,
+  .tox-statusbar__path-item,
+  .tox-statusbar__wordcount {
+    color: var(--#{$prefix}body-color) !important;
+  }
+
+  &:not([dir="rtl"]) .tox-toolbar__group:not(:last-of-type) {
+    border-right: 1px solid var(--#{$prefix}border-color) !important;
+  }
+  .tox-menu {
+    background-color: var(--#{$prefix}secondary-bg) !important;
+    border-color: var(--#{$prefix}border-color) !important;
+  }
+  .tox-collection--toolbar .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+    color: var(--#{$prefix}body-color) !important;
+  }
+  .tox-collection__item {
+    color: var(--#{$prefix}body-color) !important;
+  }
+  .tox-collection--toolbar .tox-collection__item--enabled {
+    background-color: var(--#{$prefix}tertiary-bg) !important;
+    color: var(--#{$prefix}body-color) !important;
+  }
+  .tox-collection--toolbar .tox-collection__item--active,
+  .tox-collection--list .tox-collection__item--active,
+  .tox-collection__group-heading {
+    background-color: var(--#{$prefix}tertiary-bg) !important;
+  }
+  .tox-collection--list .tox-collection__group {
+    border-color: var(--#{$prefix}border-color) !important;
+  }
+  .tox-split-button:hover {
+    box-shadow: 0 0 0 1px var(--#{$prefix}border-color) inset !important;
+  }
+  .tox-tbtn--enabled{
+    background-color: var(--#{$prefix}tertiary-bg) !important;
+  }
+}
+.editable-input {
+  .form-control {
+    display: inline-block;
+  }
+}
+
+.editable-buttons {
+  margin-left: 7px;
+  .editable-cancel {
+    margin-left: 7px;
+  }
+}
+
+// ck-editor
+
+.ck-editor__editable {
+  min-height: 250px !important;
+}
+
+.ck {
+  &.ck-reset_all,
+  &.ck-reset_all * {
+    color: var(--#{$prefix}body-color) !important;
+  }
+
+  &.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+    border-color: var(--#{$prefix}border-color) !important;
+  }
+
+  &.ck-toolbar {
+    background-color: var(--#{$prefix}tertiary-bg) !important;
+    border-color: var(--#{$prefix}border-color) !important;
+
+    .ck.ck-toolbar__separator {
+      background-color: var(--#{$prefix}border-color) !important;
+    }
+  }
+
+  &.ck-tooltip .ck-tooltip__text {
+    background-color: var(--#{$prefix}dark) !important;
+    color: var(--#{$prefix}light) !important;
+  }
+
+  &.ck-editor__main > .ck-editor__editable,
+  &.ck-list {
+    background-color: var(--#{$prefix}secondary-bg) !important;
+  }
+
+  &.ck-dropdown__panel {
+    border-color: var(--#{$prefix}border-color) !important;
+  }
+}
+
+.ck.ck-button:not(.ck-disabled):hover,
+a.ck.ck-button:not(.ck-disabled):hover,
+.ck.ck-button.ck-on,
+a.ck.ck-button.ck-on {
+  background-color: var(--#{$prefix}tertiary-bg) !important;
+}
+.tox:not(.tox-tinymce-inline) .tox-editor-header, .tox .tox-mbtn {
+  background-color: var(--#{$prefix}secondary-bg) !important;
+}
+.tox .tox-tbtn--bespoke{
+  background-color: var(--ck-color-button-default-background) !important;  
+}
+.tox .tox-tbtn--disabled, .tox .tox-tbtn{
+  background-color: var(--ck-color-button-default-background) !important;  
+}
+.tox .tox-menubar+.tox-toolbar-overlord, .tox .tox-promotion {
+  background-color: var(--#{$prefix}secondary-bg) !important;
+}
