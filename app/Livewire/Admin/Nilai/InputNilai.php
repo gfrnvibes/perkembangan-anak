@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Nilai;
 
 use App\Models\Anak;
 use App\Models\Aspek;
@@ -34,7 +34,7 @@ class InputNilai extends Component
             4 => 'Minggu 4',
         ];
         
-        return view('livewire.admin.input-nilai', [
+        return view('livewire.admin.nilai.input-nilai', [
             'anakList' => $anakList,
             'aspekList' => $aspekList,
             'mingguList' => $mingguList,

@@ -37,12 +37,18 @@ Route::get('logout', [LogoutController::class, 'logout'])->name('logout');
 // ADMIN
 Route::middleware('admin')->group(function() {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
-    Route::get('input-nilai', InputNilai::class)->name('input-nilai');
 
     // CRUD ANAK
     Route::get('daftar-anak', \App\Livewire\Admin\Anak\DaftarAnak::class)->name('daftar-anak');
     Route::get('create-anak', \App\Livewire\Admin\Anak\CreateAnak::class)->name('create-anak');
     Route::get('update-anak', \App\Livewire\Admin\Anak\UpdateAnak::class)->name('update-anak');
     Route::get('detail-anak', \App\Livewire\Admin\Anak\DetailAnak::class)->name('detail-anak');
+
+    // CRUD NILAI
+    Route::get('daftar-nilai', \App\Livewire\Admin\Nilai\DaftarNilai::class)->name('daftar-nilai');
+    Route::get('detail-nilai', \App\Livewire\Admin\Nilai\DetailNilaiAnak::class)->name('detail-nilai');
+    Route::get('input-nilai', \App\Livewire\Admin\Nilai\InputNilai::class)->name('input-nilai');
+    Route::get('update-nilai', \App\Livewire\Admin\Nilai\UpdateNilaiAnak::class)->name('update-nilai');
+
     
 });
