@@ -44,15 +44,15 @@
 
                 <li>
                     <a href="{{ route('input-nilai') }}" class="waves-effect">
-                        <i class="uil-clipboard-notes"></i>
+                        <i class="uil-edit"></i>
                         <span>Input Nilai</span>
                     </a>
                 </li>
 
                 <li class="menu-title">@lang('translation.Apps')</li>
                 <li>
-                    <a href="file-manager" class=" waves-effect">
-                        <i class="uil-comments-alt"></i>
+                    <a href="{{ route('daftar-nilai') }}" class=" waves-effect">
+                        <i class="uil-list-ul"></i>
                         <span>Daftar Nilai</span>
                     </a>
                 </li>
