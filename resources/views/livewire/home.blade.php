@@ -3,48 +3,10 @@
         <div class="container">
             <div class="row d-flex align-items-center">
                 <div class=" col-xxl-5  col-xl-6 col-lg-6 col-12">
-                    <div>
-                        <h1 class="display-5 fw-bold mb-4 text-warning">Cinta, Perhatian, dan <span class="text-danger">Tumbuh Bersama👨‍👩‍👧‍👦</span></h1>
-                        <p class="lead mb-4">Terintegrasi untuk mendukung tumbuh kembang Ananda di <strong class="text-danger fw-bold">RA Al-Amin</strong> secara lebih optimal dan transparan.</p>
-                        {{-- <ul class="list-unstyled mb-3">
-                            <li class="mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="var(--gk-success)" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
-                                    </path>
-                                </svg>
-                                <span class="ms-2">No credit card required</span>
-                            </li>
-                            <li class="mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="var(--gk-success)" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
-                                    </path>
-                                </svg>
-                                <span class="ms-2">Customer service 24/7</span>
-                            </li>
-                            <li class="mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="var(--gk-success)" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
-                                    </path>
-                                </svg>
-                                <span class="ms-2">No setup fee</span>
-                            </li>
-                            <li class="mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="var(--gk-success)" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
-                                    </path>
-                                </svg>
-                                <span class="ms-2">Cancel any time</span>
-                            </li>
-                        </ul> --}}
-                        <a href="#!" class="btn btn-warning btn-lg fw-bold">👉 Lihat Ananda</a>
+                    <div data-aos="fade-right">
+                        <h1 class="display-5 fw-bold mb-4 text-warning" data-aos="fade-right">Cinta, Perhatian, dan <span class="text-danger">Tumbuh Bersama👨‍👩‍👧‍👦</span></h1>
+                        <p class="lead mb-4">Terintegrasi untuk mendukung tumbuh kembang Ananda di <strong class="text-danger fw-bold">RA Nurul Amin</strong> secara lebih optimal dan transparan.</p>
+                        <a href="{{ route('perkembangan-ananda') }}" class="btn btn-warning btn-lg fw-bold">👉 Lihat Jejak Ananda</a>
                     </div>
                 </div>
                 <div class="col-xxl-5 offset-xxl-1 col-xl-6 col-lg-6 col-12 d-lg-flex justify-content-end">
@@ -67,7 +29,7 @@
         <div class="row">
             <div class="col-md-4 col-12">
                 <!-- card -->
-                <div class="card mb-4 mb-lg-0">
+                <div class="card mb-4 mb-lg-0 border-0 shadow-sm">
                     <!-- card body -->
                     <div class="card-body p-5">
                         <!-- icon -->
@@ -87,7 +49,7 @@
             </div>
             <div class="col-md-4 col-12">
                 <!-- card -->
-                <div class="card mb-4 mb-lg-0">
+                <div class="card mb-4 mb-lg-0 border-0 shadow-sm">
                     <!-- card body -->
                     <div class="card-body p-5">
                         <!-- icon -->
@@ -107,7 +69,7 @@
             </div>
             <div class="col-md-4 col-12">
                 <!-- card -->
-                <div class="card mb-4 mb-lg-0">
+                <div class="card mb-4 mb-lg-0 border-0 shadow-sm">
                     <!-- card body -->
                     <div class="card-body p-5">
                         <!-- icon -->

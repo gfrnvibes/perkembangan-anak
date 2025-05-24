@@ -2,7 +2,7 @@
     <!-- Login 9 - Bootstrap Brain Component -->
     <section class="py-md-3 py-xl-4">
         <div class="container">
-            <div class="row gy-4 align-items-center justify-content-between">
+            <div class="row gy-4 align-items-center justify-content-center">
                 <div class="col-12 col-md-6 col-xl-6">
                     <div class="d-flex">
                         <div class="col-12 col-xl-9">
@@ -22,7 +22,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 col-xl-5 ">
+                <div class="col-12 col-md-6 col-xl-5">
                     <div class="card border-0 rounded-4 shadow-sm">
                         <div class="card-body p-3 p-md-4 p-xl-5">
                             <div class="row">
@@ -49,7 +49,7 @@
                                             <label for="password" class="form-label">Password</label>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    {{-- <div class="col-12">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value=""
                                                 name="remember_me" id="remember_me">
@@ -57,7 +57,7 @@
                                                 Keep me logged in
                                             </label>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-12">
                                         <div class="d-grid">
                                             <button class="btn btn-primary btn-lg fw-bold" type="submit">Masuk</button>

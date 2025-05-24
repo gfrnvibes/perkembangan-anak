@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LogoutController;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\InputNilai;
 use App\Livewire\Auth\Login;
 use App\Livewire\Home;
 use App\Livewire\Perkembangan;
@@ -34,4 +35,5 @@ Route::get('logout', [LogoutController::class, 'logout'])->name('logout');
 // ADMIN
 Route::middleware('admin')->group(function() {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
+    Route::get('input-nilai', InputNilai::class)->name('input-nilai');
 });

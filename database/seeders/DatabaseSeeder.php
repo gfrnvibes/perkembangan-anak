@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class, // Run this first to create permissions
             RoleSeeder::class,       // Run this second to create roles and assign permissions
             UserSeeder::class,       // Run this last to create users and assign roles
+            AspekSeeder::class,
+            IndikatorSeeder::class,
+            TemplateCatatanSeeder::class,
         ]);
     }
 }

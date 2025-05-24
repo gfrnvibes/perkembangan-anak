@@ -4,7 +4,7 @@
             <img src="{{ asset('assets/images/paud.png') }}" alt="logo-paud" width="30px" class="me-2">
             {{-- <img src="{{ asset('assets/img/paud.png') }}" alt="logo-paud" width="30px" class="me-2"> --}}
 
-            RA Al-Amin
+            RA NURUL AMIN
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

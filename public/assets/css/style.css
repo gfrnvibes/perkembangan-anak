@@ -2,6 +2,14 @@
     font-family: 'Lexend', monospace;
 }
 
+.background-layer {
+    background: url('/assets/images/cloudy.svg') no-repeat center center fixed;
+    background-size: cover;
+    opacity: 0.3; /* Atur transparansi */
+    z-index: -1;
+
+}
+
 .min-vh-100 {
     min-height: 100vh;
 }

@@ -30,10 +30,10 @@
 <body>
 
     @include('components.navbar')
-
-    <div class="container py-5 min-vh-100">
-        {{ $slot }}
-    </div>
+    
+        <div class="container py-5 min-vh-100">
+            {{ $slot }}
+        </div>
 
     {{-- Footer --}}
     <!-- Footer -->
@@ -49,20 +49,23 @@
                         </span>RA Al-Amin. All Rights Reserved.</span>
                 </div>
                 <!-- Links -->
-                <div class="col-12 col-md-6">
+                {{-- <div class="col-12 col-md-6">
                     <nav class="nav nav-footer justify-content-center justify-content-md-end">
                         <a class="nav-link active ps-0" href="#">Privacy</a>
                         <a class="nav-link" href="#">Terms </a>
                         <a class="nav-link" href="#">Feedback</a>
                         <a class="nav-link" href="#">Support</a>
                     </nav>
-                </div>
+                </div> --}}
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous">
+    </script>
+    <script>
+        AOS.init();
     </script>
 </body>
 
