@@ -4,6 +4,7 @@
 <head>
     @include('layouts.title-meta')
     @include('layouts.head')
+    @livewireStyles
 </head>
 
 @section('body')
@@ -38,6 +39,8 @@
 
     <!-- JAVASCRIPT -->
     @include('layouts.vendor-scripts')
+
+    @livewireScripts
 </body>
 
 </html>

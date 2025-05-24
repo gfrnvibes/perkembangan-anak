@@ -64,7 +64,7 @@
                         <span>Kelola Anak</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="ecommerce-products">Daftar Anak</a></li>
+                        <li><a href="{{ route('daftar-anak') }}">Daftar Anak</a></li>
                         <li><a href="ecommerce-product-detail">Daftar Orang Tua</a></li>
                     </ul>
                 </li>

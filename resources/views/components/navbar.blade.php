@@ -19,9 +19,7 @@
                     $isAdmin = optional(Auth::user())->hasRole('admin');
                 @endphp
 
-                @auth
-                    <x-nav-link :active="request()->routeIs('perkembangan-ananda')" href="{{ route('perkembangan-ananda') }}"> Jejak Ananda</x-nav-link>
-                @endauth
+                <x-nav-link :active="request()->routeIs('perkembangan-ananda')" href="{{ route('perkembangan-ananda') }}"> Jejak Ananda</x-nav-link>
                 <x-nav-link href="">Papan Bintang</x-nav-link>
             </ul>
             <div class="d-flex gap-2">
