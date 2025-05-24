@@ -17,12 +17,12 @@ return new class extends Migration {
             $table->string('nama_panggilan');
             $table->string('nomor_induk')->unique();
             $table->string('nisn')->nullable()->unique();
-            $table->enum('jenis_kelamin', ['L', 'P']);
+            $table->string('jenis_kelamin');
             $table->string('tempat_lahir');
-            $table->date('tanggal_lahir');
+            $table->string('tanggal_lahir');
             $table->string('ayah')->nullable();
             $table->string('ibu')->nullable();
-            $table->string('wali')->nullable();
+            // $table->string('wali')->nullable();
             $table->text('alamat_lengkap');
             $table->timestamps();
         });
