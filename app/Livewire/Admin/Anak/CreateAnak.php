@@ -5,12 +5,13 @@ namespace App\Livewire\Admin\Anak;
 use App\Models\Anak;
 use App\Models\User;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
-use Illuminate\Support\Facades\Auth;
 
 #[Title('Tambah Anak Baru')]
 #[Layout('layouts.master')]
+
 class CreateAnak extends Component
 {
     // Form fields
