@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Laporan Nilai Perkembangan Anak</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Arial Narrow', sans-serif;
@@ -63,44 +64,42 @@
             margin-bottom: 3px;
         }
 
-        .nilai-table {
+        .table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
 
-        .nilai-table th,
-        .nilai-table td {
+        .table th,
+        .table td {
             border: 1px solid #333;
             padding: 8px;
             text-align: center;
             vertical-align: middle;
         }
 
-        .nilai-table th {
-            background-color: #333;
-            color: white;
-            font-weight: bold;
-        }
-
-        .nilai-table .aspek-cell {
+        .table-light th {
             background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa !important;
             font-weight: bold;
             text-align: left;
         }
 
-        .nilai-table .indikator-cell {
-            text-align: left;
-            max-width: 200px;
+        .text-center {
+            text-align: center;
         }
 
-        .badge {
-            background-color: #007bff;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
+        .text-left {
+            text-align: left;
+        }
+
+        .text-muted {
+            color: #6c757d;
         }
 
         .footer {
@@ -115,13 +114,30 @@
         .page-break {
             page-break-after: always;
         }
+
+        .catatan-section {
+            margin-top: 30px;
+        }
+
+        .catatan-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
 <body>
     {{-- Header --}}
     <div class="header">
-        <h1>CEKLIS AKHIR SEMESTER</h1>
+        @if ($periode == 'mingguan')
+            <h1>LAPORAN PERKEMBANGAN MINGGUAN</h1>
+        @elseif($periode == 'bulanan')
+            <h1>LAPORAN PERKEMBANGAN BULANAN</h1>
+        @else
+            <h1>LAPORAN PERKEMBANGAN SEMESTERAN</h1>
+        @endif
     </div>
 
     {{-- Info Anak --}}
@@ -140,7 +156,14 @@
                         Minggu {{ \Carbon\Carbon::parse($selectedWeek)->format('d M Y') }} -
                         {{ \Carbon\Carbon::parse($selectedWeek)->addDays(4)->format('d M Y') }}
                     @elseif($periode == 'bulanan')
-                        {{ DateTime::createFromFormat('!m', $selectedMonth)->format('F') }} {{ $selectedYear }}
+                        @php
+                            $monthNames = [
+                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                            ];
+                        @endphp
+                        {{ $monthNames[$selectedMonth] }} {{ $selectedYear }}
                     @else
                         Semester {{ ucfirst($selectedSemester) }} {{ $selectedYear }}
                         @if ($selectedSemester == 'ganjil')
@@ -151,114 +174,87 @@
                     @endif
                 </td>
             </tr>
-            <tr>
-                <td><strong>Tanggal Cetak</strong></td>
-                <td>:</td>
-                <td>{{ \Carbon\Carbon::now()->format('d F Y') }}</td>
-            </tr>
         </table>
     </div>
 
     {{-- Tabel Nilai --}}
     @if ($periode == 'mingguan')
         {{-- Tabel Mingguan --}}
-        @if ($selectedPeriode == 'mingguan')
-            <table class="table table-bordered table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Aspek Perkembangan</th>
-                        <th>Indikator</th>
-                        <th>Kode</th>
-                        <th>Senin</th>
-                        <th>Selasa</th>
-                        <th>Rabu</th>
-                        <th>Kamis</th>
-                        <th>Jumat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($nilaiData as $aspekNama => $nilaiAspek)
-                        @php
-                            $indikatorGroups = $nilaiAspek->groupBy('indikator_id');
-                        @endphp
-                        @foreach ($indikatorGroups as $indikatorId => $nilaiIndikator)
-                            @php
-                                $firstNilai = $nilaiIndikator->first();
-                            @endphp
-                            <tr>
-                                @if ($loop->first)
-                                    <td rowspan="{{ $indikatorGroups->count() }}" class="align-middle fw-bold bg-light">
-                                        {{ $aspekNama }}
-                                    </td>
-                                @endif
-                                <td>{{ $firstNilai->indikator->deskripsi }}</td>
-                                <td class="text-center">{{ $firstNilai->indikator->kode_indikator }}</td>
-
-                                @php
-                                    $startWeek = \Carbon\Carbon::parse($selectedWeek);
-                                @endphp
-
-                                @for ($day = 1; $day <= 5; $day++)
-                                    <td class="text-center">
-                                        @php
-                                            $targetDate = $startWeek
-                                                ->copy()
-                                                ->addDays($day - 1)
-                                                ->format('Y-m-d');
-                                            $nilaiHari = $nilaiIndikator->where('tanggal', $targetDate)->first();
-                                        @endphp
-                                        @if ($nilaiHari)
-                                            <span
-                                                class="badge bg-primary">{{ $nilaiMapping[$nilaiHari->nilai_numerik] }}</span>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                @endfor
-                            </tr>
-                        @endforeach
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    @elseif($periode == 'bulanan')
-        {{-- Tabel Bulanan --}}
-        <table class="nilai-table">
-            <thead>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light text-center align-middle">
                 <tr>
-                    <th colspan="3">KD & INDIKATOR</th>
-                    <th colspan="4">MINGGU KE</th>
-                    <th rowspan="2">CAPAIAN AKHIR BULAN</th>
-                </tr>
-                <tr>
-                    <th width="7.5%">Minggu 1</th>
-                    <th width="7.5%">Minggu 2</th>
-                    <th width="7.5%">Minggu 3</th>
-                    <th width="7.5%">Minggu 4</th>
+                    <th colspan="2" rowspan="2">KD & INDIKATOR</th>
+                    <th rowspan="2">CAPAIAN<br>MINGGU INI</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($nilaiData as $aspekNama => $nilaiAspek)
-                    @foreach ($nilaiAspek as $index => $nilai)
+                    <tr>
+                        <td colspan="3" class="bg-light">
+                            {{ $aspekNama }}
+                        </td>
+                    </tr>
+                    @foreach ($nilaiAspek as $nilai)
                         <tr>
-                            @if ($index == 0)
-                                <td rowspan="{{ $nilaiAspek->count() }}" class="aspek-cell">
-                                    {{ $aspekNama }}
-                                </td>
-                            @endif
-                            <td>{{ $nilai->indikator->kode_indikator }}</td>
-                            <td class="indikator-cell">{{ $nilai->indikator->deskripsi }}</td>
+                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
+                            <td class="text-left">{{ $nilai->indikator->deskripsi }}</td>
+                            <td class="text-center">
+                                @if ($nilai->nilai_numerik)
+                                    {{ $nilaiMapping[$nilai->nilai_numerik] }}
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                @endforeach
+            </tbody>
+        </table>
+    @elseif($periode == 'bulanan')
+        {{-- Tabel Bulanan --}}
+        <table class="table table-bordered table-striped">
+            <thead class="table-light text-center align-middle">
+                <tr>
+                    <th rowspan="2" colspan="2">KD & INDIKATOR</th>
+                    <th colspan="4">MINGGU KE</th>
+                    <th rowspan="2">CAPAIAN<br>AKHIR BLN</th>
+                </tr>
+                <tr>
+                    <th>Minggu 1</th>
+                    <th>Minggu 2</th>
+                    <th>Minggu 3</th>
+                    <th>Minggu 4</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($nilaiData as $aspekNama => $nilaiAspek)
+                    <tr>
+                        <td colspan="7" class="bg-light">
+                            {{ $aspekNama }}
+                        </td>
+                    </tr>
+                    @foreach ($nilaiAspek as $nilai)
+                        <tr>
+                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
+                            <td class="text-left">{{ $nilai->indikator->deskripsi }}</td>
 
                             @for ($week = 1; $week <= 4; $week++)
-                                <td>
+                                <td class="text-center">
                                     @if (isset($nilai->minggu_data["minggu_$week"]))
-                                        <span
-                                            class="badge">{{ $nilaiMapping[$nilai->minggu_data["minggu_$week"]] }}</span>
+                                        {{ $nilaiMapping[$nilai->minggu_data["minggu_$week"]] }}
                                     @else
-                                        -
+                                        <span class="text-muted">-</span>
                                     @endif
                                 </td>
                             @endfor
+
+                            <td class="text-center">
+                                @if ($nilai->capaian_akhir_bulan)
+                                    {{ $nilaiMapping[$nilai->capaian_akhir_bulan] }}
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 @endforeach
@@ -266,62 +262,67 @@
         </table>
     @else
         {{-- Tabel Semesteran --}}
-        <table class="nilai-table">
-            <thead class="table-danger text-white align-middle text-center">
+        <table class="table table-bordered table-striped">
+            <thead class="table-light text-center align-middle">
                 <tr>
-                    <th colspan="3">KD & INDIKATOR</th>
+                    <th rowspan="2" colspan="2">KD & INDIKATOR</th>
                     <th colspan="6">BULAN</th>
-                    <th rowspan="2">CAPAIAN AKHIR SMT</th>
+                    <th rowspan="2">CAPAIAN<br>AKHIR SMT</th>
                 </tr>
                 <tr>
                     @if ($selectedSemester == 'ganjil')
-                        <th width="7%">Jul</th>
-                        <th width="7%">Agu</th>
-                        <th width="7%">Sep</th>
-                        <th width="7%">Okt</th>
-                        <th width="7%">Nov</th>
-                        <th width="7%">Des</th>
+                        <th>Jul</th>
+                        <th>Agu</th>
+                        <th>Sep</th>
+                        <th>Okt</th>
+                        <th>Nov</th>
+                        <th>Des</th>
                     @else
-                        <th width="7%">Jan</th>
-                        <th width="7%">Feb</th>
-                        <th width="7%">Mar</th>
-                        <th width="7%">Apr</th>
-                        <th width="7%">Mei</th>
-                        <th width="7%">Jun</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>Mei</th>
+                        <th>Jun</th>
                     @endif
                 </tr>
             </thead>
-
             <tbody>
                 @foreach ($nilaiData as $aspekNama => $nilaiAspek)
-                    @foreach ($nilaiAspek as $index => $nilai)
+                    <tr>
+                        <td colspan="9" class="bg-light">
+                            {{ $aspekNama }}
+                        </td>
+                    </tr>
+                    @foreach ($nilaiAspek as $nilai)
                         <tr>
-                            @if ($index == 0)
-                                <td rowspan="9" class="aspek-cell">
-                                    {{ $aspekNama }}
-                                </td>
-                            @endif
-                        </tr>
-                        <tr>
-                            <td>{{ $nilai->indikator->kode_indikator }}</td>
-                            <td class="indikator-cell">{{ $nilai->indikator->deskripsi }}</td>
+                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
+                            <td class="text-left">{{ $nilai->indikator->deskripsi }}</td>
 
                             @php
                                 $months =
                                     $selectedSemester == 'ganjil'
-                                        ? ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                                        : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                                        ? ['Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+                                        : ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];
                             @endphp
 
                             @foreach ($months as $month)
-                                <td>
+                                <td class="text-center">
                                     @if (isset($nilai->bulan_data[$month]))
-                                        <span class="badge">{{ $nilaiMapping[$nilai->bulan_data[$month]] }}</span>
+                                        {{ $nilaiMapping[$nilai->bulan_data[$month]] }}
                                     @else
-                                        -
+                                        <span class="text-muted">-</span>
                                     @endif
                                 </td>
                             @endforeach
+
+                            <td class="text-center">
+                                @if ($nilai->capaian_akhir_semester)
+                                    {{ $nilaiMapping[$nilai->capaian_akhir_semester] }}
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 @endforeach
@@ -342,8 +343,6 @@
 
     {{-- Footer --}}
     <div class="footer">
-        <p>Dicetak pada: {{ \Carbon\Carbon::now()->format('d F Y, H:i') }} WIB</p>
-
         <div class="signature">
             <table width="100%">
                 <tr>
@@ -358,7 +357,6 @@
             </table>
         </div>
     </div>
-
 
 </body>
 
