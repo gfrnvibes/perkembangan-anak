@@ -13,7 +13,7 @@ class Aspek extends Model
 
     protected $fillable = ['nama_aspek'];
 
-    public function indikator()
+    public function indikators()
     {
         return $this->hasMany(Indikator::class);
     }

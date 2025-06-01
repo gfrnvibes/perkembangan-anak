@@ -21,7 +21,6 @@ class UserSeeder extends Seeder
         $admin = User::create([
             'name' => 'Guru',
             'email' => 'guru@gmail.com',
-            'phone' => '081234567890',
             'password' => Hash::make('password'),
         ]);
 
@@ -29,7 +28,6 @@ class UserSeeder extends Seeder
         $user = User::create([
             'name' => 'Husni Moh Jaelani',
             'email' => 'husni@gmail.com',
-            'phone' => '081234567891',
             'password' => Hash::make('password'),
         ]);
 
@@ -46,7 +44,6 @@ class UserSeeder extends Seeder
             $ortu = User::create([
                 'name' => ucwords(strtolower($name)),
                 'email' => $email,
-                'phone' => $faker->phoneNumber,
                 'password' => Hash::make('password'),
             ]);
             $ortu->assignRole('user');

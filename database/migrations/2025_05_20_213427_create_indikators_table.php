@@ -13,7 +13,8 @@ return new class extends Migration {
         Schema::create('indikators', function (Blueprint $table) {
             $table->id();
             $table->foreignId('aspek_id')->constrained()->onDelete('cascade');
-            $table->string('deskripsi'); // Contoh: Mengelompokkan benda berdasarkan warna
+            $table->string('kode_indikator');
+            $table->string('deskripsi');
             $table->timestamps();
         });
     }

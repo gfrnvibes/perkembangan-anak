@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('aspeks', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_aspek');
             $table->string('nama_aspek');
             $table->timestamps();
         });

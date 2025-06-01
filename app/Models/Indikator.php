@@ -27,4 +27,9 @@ class Indikator extends Model
     {
         return $this->hasMany(TemplateCatatan::class, 'indikator_perkembangan_id');
     }
+
+    public function nilais()
+    {
+        return $this->hasMany(Nilai::class);
+    }
 }

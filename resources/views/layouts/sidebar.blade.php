@@ -5,10 +5,10 @@
     <div class="navbar-brand-box">
         <a href="{{ url('index') }}" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="{{ URL::asset('/assets/images/paud.png') }}" alt="" height="28">
+                <img src="{{ URL::asset('/assets/images/paud.png') }}" alt="" height="32">
             </span>
             <span class="logo-lg">
-                <img src="{{ URL::asset('/assets/images/paud.png') }}" alt="" height="24">
+                <img src="{{ URL::asset('/assets/images/paud.png') }}" alt="" height="26">
                 <span class="text-dark fw-bold ms-2 text-uppercase fs-5">RA nurul amin</span>
             </span>
         </a>
