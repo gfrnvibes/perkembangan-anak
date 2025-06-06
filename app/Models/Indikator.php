@@ -18,11 +18,6 @@ class Indikator extends Model
         return $this->belongsTo(Aspek::class, 'aspek_id');
     }
 
-    public function penilaianMingguan()
-    {
-        return $this->hasMany(PenilaianMingguan::class);
-    }
-
     public function templateCatatan()
     {
         return $this->hasMany(TemplateCatatan::class, 'indikator_perkembangan_id');

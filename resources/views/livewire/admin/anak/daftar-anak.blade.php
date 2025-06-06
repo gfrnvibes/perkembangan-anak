@@ -115,14 +115,16 @@
                                 <td>{{ $item->ibu }}</td>
                                 <td>{{ $item->alamat_lengkap }}</td>
                                 <td class="text-center">
-                                    <button class="btn btn-primary btn-sm"
-                                        wire:click="editAnak({{ $item->id }})"><i
-                                            class="bi bi-pencil-square"></i></button>
-                                    <button class="btn btn-danger btn-sm" wire:click="deleteAnak({{ $item->id }})"
-                                        wire:confirm='Apa kamu yakin ingin menghapus ini?'><i
-                                            class="bi bi-trash"></i></button>
-                                    <button class="btn btn-info btn-sm" wire:click="showAnak({{ $item->id }})"><i
-                                            class="bi bi-eye"></i></button>
+                                    <div class="btn-group">
+                                        <button class="btn btn-primary btn-sm"
+                                            wire:click="editAnak({{ $item->id }})"><i
+                                                class="bi bi-pencil-square"></i></button>
+                                        <button class="btn btn-danger btn-sm" wire:click="deleteAnak({{ $item->id }})"
+                                            wire:confirm='Apa kamu yakin ingin menghapus ini?'><i
+                                                class="bi bi-trash"></i></button>
+                                        <button class="btn btn-info btn-sm" wire:click="showAnak({{ $item->id }})"><i
+                                                class="bi bi-eye"></i></button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

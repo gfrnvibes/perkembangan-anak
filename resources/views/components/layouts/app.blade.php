@@ -20,18 +20,23 @@
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
+    
+    
     <!-- Font Awesome 5 CDN (Free version) -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
-        integrity="sha384-jLKHWMZtD6YvMlXoImdCJjOulFvWDbCoA3D0zWRZLkNBlQg4qJxMBE+Z4YBkt9I5" crossorigin="anonymous">
-
+    integrity="sha384-jLKHWMZtD6YvMlXoImdCJjOulFvWDbCoA3D0zWRZLkNBlQg4qJxMBE+Z4YBkt9I5" crossorigin="anonymous">
+    
     <title>{{ $title ?? 'Page Title' }}</title>
+    {{-- <script src="{{ asset('assets/libs/chart.js/chart.min.js') }}"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @stack('scripts')
 </head>
 
 <body>
 
     @include('components.navbar')
     
-        <div class="container py-5 min-vh-100">
+        <div class="min-vh-100">
             {{ $slot }}
         </div>
 
@@ -64,9 +69,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous">
     </script>
-    <script>
+    {{-- <script>
         AOS.init();
-    </script>
+    </script> --}}
 </body>
 
 </html>

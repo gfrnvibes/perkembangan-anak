@@ -4,13 +4,14 @@ namespace App\Livewire\Admin\Anak;
 
 use App\Models\Anak;
 use Livewire\Component;
-use Livewire\WithFileUploads;
-use Livewire\WithPagination;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportAnak;
 use App\Imports\AnakImport;
+use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 #[Title('Daftar Anak')]
 #[Layout('layouts.master')]
@@ -187,13 +188,13 @@ class DaftarAnak extends Component
             }
             
             // Log informasi file
-            \Log::info('Importing Excel file: ' . $fullPath);
+            Log::info('Importing Excel file: ' . $fullPath);
             
             // Import dengan try-catch untuk menangkap error spesifik
             try {
                 Excel::import(new AnakImport, $fullPath);
             } catch (\Exception $e) {
-                \Log::error('Excel import error: ' . $e->getMessage());
+                Log::error('Excel import error: ' . $e->getMessage());
                 session()->flash('error', 'Gagal mengimpor file: ' . $e->getMessage());
                 return;
             }
@@ -202,7 +203,7 @@ class DaftarAnak extends Component
             session()->flash('message', 'Data anak berhasil diimpor.');
             
         } catch (\Exception $e) {
-            \Log::error('Import process error: ' . $e->getMessage());
+            Log::error('Import process error: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }

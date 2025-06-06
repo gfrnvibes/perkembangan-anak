@@ -1,4 +1,4 @@
-<div>
+<div class="container p-5">
     <section class="py-lg-16 py-6 mb-5">
         <div class="container">
             <div class="row d-flex align-items-center">

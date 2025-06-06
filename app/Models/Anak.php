@@ -18,11 +18,6 @@ class Anak extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function penilaianMingguan()
-    {
-        return $this->hasMany(PenilaianMingguan::class);
-    }
-
     public function nilais()
     {
         return $this->hasMany(Nilai::class);
