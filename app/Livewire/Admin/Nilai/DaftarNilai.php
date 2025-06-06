@@ -2,16 +2,17 @@
 
 namespace App\Livewire\Admin\Nilai;
 
+use ZipArchive;
+use Carbon\Carbon;
 use App\Models\Anak;
-use App\Models\Nilai;
 use App\Models\Aspek;
+use App\Models\Nilai;
 use Livewire\Component;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Layout;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
+use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\DB;
-use ZipArchive;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 #[Title('Daftar Nilai')]
@@ -151,7 +152,7 @@ private function getNilaiBulanan()
         ->get();
 
     // Debug: tambahkan ini untuk melihat data yang ditemukan
-    \Log::info('Data nilai ditemukan:', [
+    Log::info('Data nilai ditemukan:', [
         'count' => $nilaiData->count(),
         'anak_id' => $this->selectedAnak,
         'bulan' => $this->selectedMonth,
