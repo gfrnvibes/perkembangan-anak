@@ -153,14 +153,38 @@
                 <td>:</td>
                 <td>
                     @if ($periode == 'mingguan')
-                        Minggu {{ \Carbon\Carbon::parse($selectedWeek)->format('d M Y') }} -
-                        {{ \Carbon\Carbon::parse($selectedWeek)->addDays(4)->format('d M Y') }}
+                        @php
+                            $monthNames = [
+                                1 => 'Januari',
+                                2 => 'Februari',
+                                3 => 'Maret',
+                                4 => 'April',
+                                5 => 'Mei',
+                                6 => 'Juni',
+                                7 => 'Juli',
+                                8 => 'Agustus',
+                                9 => 'September',
+                                10 => 'Oktober',
+                                11 => 'November',
+                                12 => 'Desember',
+                            ];
+                        @endphp
+                        Minggu ke-{{ $selectedWeek }}, {{ $monthNames[$selectedMonth] }} {{ $selectedYear }}
                     @elseif($periode == 'bulanan')
                         @php
                             $monthNames = [
-                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                1 => 'Januari',
+                                2 => 'Februari',
+                                3 => 'Maret',
+                                4 => 'April',
+                                5 => 'Mei',
+                                6 => 'Juni',
+                                7 => 'Juli',
+                                8 => 'Agustus',
+                                9 => 'September',
+                                10 => 'Oktober',
+                                11 => 'November',
+                                12 => 'Desember',
                             ];
                         @endphp
                         {{ $monthNames[$selectedMonth] }} {{ $selectedYear }}
@@ -174,6 +198,7 @@
                     @endif
                 </td>
             </tr>
+
         </table>
     </div>
 
@@ -183,8 +208,8 @@
         <table class="table table-bordered table-striped">
             <thead class="table-light text-center align-middle">
                 <tr>
-                    <th colspan="2" rowspan="2">KD & INDIKATOR</th>
-                    <th rowspan="2">CAPAIAN<br>MINGGU INI</th>
+                    <th colspan="2">KD & INDIKATOR</th>
+                    <th>CAPAIAN MINGGU INI</th>
                 </tr>
             </thead>
             <tbody>

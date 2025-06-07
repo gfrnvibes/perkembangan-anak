@@ -37,7 +37,7 @@
 
                 <li>
                     <a href="{{ route('dashboard') }}" class="waves-effect">
-                        <i class="uil-home-alt"></i><span class="badge rounded-pill bg-primary float-end">01</span>
+                        <i class="uil-home-alt"></i>
                         <span>@lang('translation.Dashboard')</span>
                     </a>
                 </li>
