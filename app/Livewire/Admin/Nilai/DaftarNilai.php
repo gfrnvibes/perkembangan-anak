@@ -516,16 +516,10 @@ private function getNilaiBulananForAnak($anakId)
     public function getWeekOptions()
     {
         $weeks = [];
-        $year = $this->selectedYear ?: date('Y');
-
-        // Generate 52 weeks for the year
-        for ($week = 1; $week <= 52; $week++) {
-            $startOfWeek = Carbon::now()->setISODate($year, $week)->startOfWeek();
-            $endOfWeek = $startOfWeek->copy()->endOfWeek();
-
-            $weeks[$week] = "Minggu ke-$week ({$startOfWeek->format('d/m')} - {$endOfWeek->format('d/m')})";
+        // Generate minggu 1-4
+        for ($week = 1; $week <= 4; $week++) {
+            $weeks[$week] = "Minggu ke-$week";
         }
-
         return $weeks;
     }
 

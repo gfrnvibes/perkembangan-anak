@@ -58,7 +58,7 @@
                         class="form-select @error('selectedBulan') is-invalid @enderror">
                         @for ($i = 1; $i <= 12; $i++)
                             <option value="{{ $i }}">
-                                {{ DateTime::createFromFormat('!m', $i)->format('F') }}
+                                {{ \Carbon\Carbon::create()->month($i)->locale('id')->isoFormat('MMMM') }}
                             </option>
                         @endfor
                     </select>
@@ -79,6 +79,16 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+
+                <div class="col-md-3">
+                    <label for="semester" class="form-label">Semester</label>
+                    <select class="form-select bg-light" disabled>
+                        <option value="{{ $selectedBulan >= 1 && $selectedBulan <= 6 ? 2 : 1 }}">
+                            Semester {{ $selectedBulan >= 1 && $selectedBulan <= 6 ? 2 : 1 }}
+                        </option>
+                    </select>
+                </div>
+
             </div>
 
             {{-- Tabel Input Nilai --}}

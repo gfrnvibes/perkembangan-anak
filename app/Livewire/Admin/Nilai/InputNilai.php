@@ -20,6 +20,7 @@ class InputNilai extends Component
     public $selectedAnak;
     public $selectedMinggu = 1;
     public $selectedBulan;
+    public $selectedSemester;
     public $selectedTahun;
     public $nilai = [];
     public $catatan = [];
@@ -40,6 +41,7 @@ class InputNilai extends Component
         $this->aspekList = Aspek::with('indikators')->get();
         $this->selectedBulan = date('n');
         $this->selectedTahun = date('Y');
+        $this->selectedSemester = $this->selectedBulan >= 1 && $this->selectedBulan <= 6 ? 2 : 1;
         
         // Initialize nilai dan catatan array
         foreach ($this->aspekList as $aspek) {
@@ -68,6 +70,8 @@ class InputNilai extends Component
         if ($this->selectedAnak) {
             $this->loadExistingData();
         }
+
+            $this->selectedSemester = $this->selectedBulan >= 1 && $this->selectedBulan <= 6 ? 2 : 1;
     }
 
     public function updatedSelectedTahun()
