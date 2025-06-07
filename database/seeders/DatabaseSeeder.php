@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Nilai;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,7 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,       // Run this last to create users and assign roles
             AspekSeeder::class,
             IndikatorSeeder::class,
-            TemplateCatatanSeeder::class,
+            AnakSeeder::class,
+            NilaiSeeder::class,
         ]);
     }
 }

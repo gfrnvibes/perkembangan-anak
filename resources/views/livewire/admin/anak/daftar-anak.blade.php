@@ -108,7 +108,12 @@
                                 <td>{{ $item->nama_lengkap }}</td>
                                 <td>{{ $item->nomor_induk }}</td>
                                 <td>{{ $item->nisn }}</td>
-                                <td>{{ $item->jenis_kelamin }}</td>
+                                <td class="text-center">
+                                    @if ($item->jenis_kelamin == 'Laki-laki')
+                                        L
+                                    @else
+                                        P
+                                    @endif
                                 <td>{{ $item->tempat_lahir }},
                                     {{ \Carbon\Carbon::parse($item->tanggal_lahir)->format('d-m-Y') }}</td>
                                 <td>{{ $item->ayah }}</td>

@@ -27,7 +27,7 @@ class TemplateCatatanSeeder extends Seeder
                 DB::table('template_catatans')->insert([
                     'indikator_id' => $indikator->id,
                     'nilai' => $kode,
-                    'isi_template' => 'Ananda ' . $teks . ' ' . strtolower($indikator->deskripsi) . '.',
+                    'isi_template' => 'Ananda ' . $teks . ' ' . strtolower($indikator->nama_indikator) . '.',
                 ]);
             }
         }

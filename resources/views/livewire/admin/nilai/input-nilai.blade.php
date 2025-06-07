@@ -2,7 +2,7 @@
     <div class="card">
         <div class="card-header fw-bold">
             <h3 class="card-title">
-                Input Nilai Perkembangan Anak (Mingguan)
+                Input Nilai Perkembangan Anak (Mingguan) - Ultra Optimized
             </h3>
         </div>
         <div class="card-body p-4">
@@ -79,12 +79,11 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-3">
                     <label for="semester" class="form-label">Semester</label>
                     <select class="form-select bg-light" disabled>
-                        <option value="{{ $selectedBulan >= 1 && $selectedBulan <= 6 ? 2 : 1 }}">
-                            Semester {{ $selectedBulan >= 1 && $selectedBulan <= 6 ? 2 : 1 }}
+                        <option value="{{ $selectedSemester }}">
+                            Semester {{ ucfirst($selectedSemester) }}
                         </option>
                     </select>
                 </div>
@@ -98,7 +97,7 @@
                         <thead class="table-light">
                             <tr class="text-center align-middle">
                                 <th width="20%">Aspek Perkembangan</th>
-                                <th width="10%">Kode</th>
+                                {{-- <th width="10%">Kode</th> --}}
                                 <th width="30%">Indikator</th>
                                 <th width="15%">Nilai</th>
                                 <th width="25%">Catatan</th>
@@ -107,43 +106,46 @@
                         <tbody>
                             @foreach ($aspekList as $aspek)
                                 @foreach ($aspek->indikators as $index => $indikator)
+                                    @php
+                                        $key = "aspek_{$aspek->id}_indikator_{$indikator->id}";
+                                    @endphp
                                     <tr class="align-middle">
                                         @if ($index == 0)
                                             <td rowspan="{{ $aspek->indikators->count() }}"
-                                                class="align-middle fw-bold bg-light">
-                                                {{ $aspek->kode_aspek }}
+                                                class="align-middle fw-bold">
+                                                {{ $aspek->nama_aspek }}
                                             </td>
                                         @endif
-                                        <td class="text-center">{{ $indikator->kode_indikator }}</td>
-                                        <td>{{ $indikator->deskripsi }}</td>
+                                        {{-- <td class="text-center">{{ $indikator->kode_indikator ?? 'IND-' . $indikator->id }}</td> --}}
+                                        <td>{{ $indikator->nama_indikator }}</td>
                                         <td class="text-center">
-                                            <select wire:model.live="nilai.{{ $indikator->id }}"
-                                                class="form-select form-select-sm @error('nilai.' . $indikator->id) is-invalid @enderror">
+                                            <select wire:model.live="nilai.{{ $key }}"
+                                                class="form-select form-select-sm @error('nilai.' . $key) is-invalid @enderror">
                                                 <option value="">-- Pilih --</option>
-                                                @foreach ($nilaiMapping as $key => $label)
-                                                    <option value="{{ $key }}">{{ $key }} -
+                                                @foreach ($nilaiMapping as $nilaiKey => $label)
+                                                    <option value="{{ $nilaiKey }}">{{ $nilaiKey }} -
                                                         {{ explode(' (', $label)[1] ?? $label }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @error('nilai.' . $indikator->id)
+                                            @error('nilai.' . $key)
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </td>
                                         <td>
-                                            <textarea wire:model="catatan.{{ $indikator->id }}"
-                                                class="form-control form-control-sm @error('catatan.' . $indikator->id) is-invalid @enderror" rows="3"
+                                            <textarea wire:model="catatan.{{ $key }}"
+                                                class="form-control form-control-sm @error('catatan.' . $key) is-invalid @enderror" rows="3"
                                                 placeholder="Catatan akan otomatis muncul saat memilih nilai, atau tulis catatan custom..."></textarea>
-                                            @error('catatan.' . $indikator->id)
+                                            @error('catatan.' . $key)
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
 
                                             {{-- Info jika catatan dari template --}}
-                                            @if (!empty($catatan[$indikator->id]) && !empty($nilai[$indikator->id]))
+                                            @if (!empty($catatan[$key]) && !empty($nilai[$key]))
                                                 @php
                                                     $template = null;
-                                                    $nilaiMapping = [1 => 'BB', 2 => 'MB', 3 => 'BSH', 4 => 'BSB'];
-                                                    $nilaiKode = $nilaiMapping[$nilai[$indikator->id]] ?? null;
+                                                    $nilaiMappingCheck = [1 => 'BB', 2 => 'MB', 3 => 'BSH', 4 => 'BSB'];
+                                                    $nilaiKode = $nilaiMappingCheck[$nilai[$key]] ?? null;
                                                     if ($nilaiKode) {
                                                         $template = \App\Models\TemplateCatatan::where(
                                                             'indikator_id',
@@ -153,8 +155,7 @@
                                                             ->first();
                                                     }
                                                     $isFromTemplate =
-                                                        $template &&
-                                                        $catatan[$indikator->id] === $template->isi_template;
+                                                        $template && $catatan[$key] === $template->isi_template;
                                                 @endphp
 
                                                 @if ($isFromTemplate)
@@ -176,18 +177,67 @@
                 </div>
 
                 {{-- Info Periode --}}
-                <div class="alert alert-warning mb-4">
+                {{-- <div class="alert alert-warning mb-4">
                     <h6 class="alert-heading">
                         <i class="fas fa-calendar-week"></i> Periode Penilaian:
                     </h6>
                     <p class="mb-0">
                         <strong>Minggu {{ $selectedMinggu }}</strong> -
                         <strong>{{ DateTime::createFromFormat('!m', $selectedBulan)->format('F') }}
-                            {{ $selectedTahun }}</strong>
+                            {{ $selectedTahun }}</strong> -
+                        <strong>Semester {{ ucfirst($selectedSemester) }}</strong>
                     </p>
                     <small class="text-muted">
-                        Penilaian dilakukan 1x per minggu. Pastikan semua nilai dan catatan sudah terisi dengan benar.
+                        Penilaian dilakukan 1x per minggu. Data disimpan dalam format JSON ultra optimized - 1 record
+                        per anak per tahun.
                     </small>
+                </div> --}}
+
+                {{-- Perbaikan bagian info storage --}}
+                {{-- <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-database"></i> Storage Ultra Optimized:
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="mb-0 small">
+                                @php
+                                    $totalIndikator = 0;
+                                    foreach ($aspekList as $aspek) {
+                                        $totalIndikator += $aspek->indikators->count();
+                                    }
+                                    $strukturLama = $totalIndikator * 12 * 4;
+                                @endphp
+                                <li><strong>Struktur Lama:</strong> {{ $strukturLama }} records per anak</li>
+                                <li><strong>Struktur Baru:</strong> 1 record per anak per tahun</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="mb-0 small">
+                                <li><strong>Pengurangan:</strong> ~99.9% lebih sedikit records</li>
+                                <li><strong>Format:</strong> JSON dengan nested structure</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div> --}}
+
+                {{-- Keterangan Nilai --}}
+                <div class="alert alert-info mb-4 mt-4">
+                    <h6 class="alert-heading">Keterangan Penilaian:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li><strong>1 - BB:</strong> Belum Berkembang</li>
+                                <li><strong>2 - MB:</strong> Mulai Berkembang</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li><strong>3 - BSH:</strong> Berkembang Sesuai Harapan</li>
+                                <li><strong>4 - BSB:</strong> Berkembang Sangat Baik</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
@@ -205,42 +255,53 @@
                 </div>
             @endif
 
-            {{-- Keterangan Nilai --}}
-            <div class="alert alert-info mb-4 mt-4">
-                <h6 class="alert-heading">Keterangan Penilaian:</h6>
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="mb-0">
-                            <li><strong>1 - BB:</strong> Belum Berkembang</li>
-                            <li><strong>2 - MB:</strong> Mulai Berkembang</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <ul class="mb-0">
-                            <li><strong>3 - BSH:</strong> Berkembang Sesuai Harapan</li>
-                            <li><strong>4 - BSB:</strong> Berkembang Sangat Baik</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
             {{-- Informasi Tambahan --}}
-            <div class="mt-4">
+            {{-- <div class="mt-4">
                 <div class="card bg-light">
                     <div class="card-body">
                         <h6 class="card-title">
-                            <i class="fas fa-lightbulb text-warning"></i> Tips Penggunaan:
+                            <i class="fas fa-lightbulb text-warning"></i> Tips Penggunaan Ultra Optimized:
                         </h6>
                         <ul class="mb-0 small">
                             <li>Pilih nilai terlebih dahulu, catatan akan otomatis muncul dari template</li>
                             <li>Anda dapat mengedit catatan sesuai kebutuhan untuk setiap anak</li>
                             <li>Catatan yang diedit akan ditandai sebagai "catatan custom"</li>
-                            <li>Pastikan semua field terisi sebelum menyimpan</li>
+                            <li>Semua data disimpan dalam 1 record JSON per anak per tahun</li>
                             <li>Data yang sudah disimpan dapat diedit dengan memilih periode yang sama</li>
+                            <li><strong>Keuntungan:</strong> Database lebih ringan, query lebih cepat, storage minimal
+                            </li>
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div> --}}
+
+            {{-- Debug Info (hanya untuk development) --}}
+            @if (config('app.debug') && $selectedAnak)
+                <div class="mt-4">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">
+                                <i class="fas fa-bug"></i> Debug Info (Development Only)
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <small>
+                                <strong>Selected:</strong> Anak: {{ $selectedAnak }},
+                                Minggu: {{ $selectedMinggu }},
+                                Bulan: {{ $selectedBulan }},
+                                Tahun: {{ $selectedTahun }},
+                                Semester: {{ $selectedSemester }}
+                            </small>
+                            <br>
+                            <small>
+                                <strong>JSON Path:</strong>
+                                semester_{{ $selectedSemester }} → aspek_X → indikator_Y → bulan_{{ $selectedBulan }}
+                                → minggu_{{ $selectedMinggu }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>

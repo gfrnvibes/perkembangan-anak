@@ -2,29 +2,77 @@
 
 namespace App\Models;
 
-use App\Models\Aspek;
-use App\Models\TemplateCatatan;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Indikator extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['aspek_id', 'deskripsi'];
+    protected $fillable = [
+        'aspek_id',
+        'nama_indikator',
+        'deskripsi',
+        'urutan',
+        // 'is_active'
+    ];
 
+    // protected $casts = [
+    //     'is_active' => 'boolean'
+    // ];
+
+    // Relasi: Indikator belongs to Aspek
     public function aspek()
     {
-        return $this->belongsTo(Aspek::class, 'aspek_id');
+        return $this->belongsTo(Aspek::class);
     }
 
-    public function templateCatatan()
+    // Helper method untuk mendapatkan nilai indikator ini untuk anak tertentu
+    public function getNilaiForAnak($anakId, $semester = null, $bulan = null, $minggu = null, $tahun = null)
     {
-        return $this->hasMany(TemplateCatatan::class, 'indikator_perkembangan_id');
+        $tahun = $tahun ?? date('Y');
+        $nilai = Nilai::where('anak_id', $anakId)
+            ->where('tahun', $tahun)
+            ->first();
+            
+        if (!$nilai) return null;
+        
+        $nilaiData = $nilai->nilai_data;
+        $aspekKey = "aspek_{$this->aspek_id}";
+        $indikatorKey = "indikator_{$this->id}";
+        
+        if ($semester && $bulan && $minggu) {
+            // Ambil nilai spesifik minggu
+            return $nilaiData["semester_{$semester}"][$aspekKey][$indikatorKey]["bulan_{$bulan}"]["minggu_{$minggu}"] ?? null;
+        } elseif ($semester && $bulan) {
+            // Ambil nilai seluruh minggu dalam bulan
+            return $nilaiData["semester_{$semester}"][$aspekKey][$indikatorKey]["bulan_{$bulan}"] ?? null;
+        } elseif ($semester) {
+            // Ambil nilai seluruh bulan dalam semester
+            return $nilaiData["semester_{$semester}"][$aspekKey][$indikatorKey] ?? null;
+        }
+        
+        return $nilaiData[$aspekKey][$indikatorKey] ?? null;
     }
 
-    public function nilais()
+    // Helper method untuk mendapatkan catatan
+    public function getCatatanForAnak($anakId, $semester = null, $bulan = null, $minggu = null, $tahun = null)
     {
-        return $this->hasMany(Nilai::class);
+        $tahun = $tahun ?? date('Y');
+        $nilai = Nilai::where('anak_id', $anakId)
+            ->where('tahun', $tahun)
+            ->first();
+            
+        if (!$nilai || !$nilai->catatan_data) return null;
+        
+        $catatanData = $nilai->catatan_data;
+        $aspekKey = "aspek_{$this->aspek_id}";
+        $indikatorKey = "indikator_{$this->id}";
+        
+        if ($semester && $bulan && $minggu) {
+            return $catatanData["semester_{$semester}"][$aspekKey][$indikatorKey]["bulan_{$bulan}"]["minggu_{$minggu}"] ?? null;
+        }
+        
+        return null;
     }
 }

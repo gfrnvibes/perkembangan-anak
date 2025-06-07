@@ -1,4 +1,142 @@
 <div>
+    {{-- Additional Information Card - Moved above table --}}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-info-circle me-2"></i>Informasi Laporan
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <table class="table table-sm">
+                        @if ($selectedAnak)
+                            <tr>
+                                <td><strong>Nama Anak:</strong></td>
+                                <td>{{ $anakList->find($selectedAnak)->nama_lengkap ?? '-' }}</td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td><strong>Mode:</strong></td>
+                                <td><span class="badge bg-info">Download Semua Anak</span></td>
+                            </tr>
+                        @endif
+                        <tr>
+                            <td><strong>Periode:</strong></td>
+                            <td>{{ ucfirst($selectedPeriode) }}</td>
+                        </tr>
+                        @if ($selectedPeriode == 'mingguan')
+                            <tr>
+                                <td><strong>Minggu:</strong></td>
+                                <td>Minggu ke-{{ $selectedWeek ?? '-' }}, {{ $monthOptions[$selectedMonth] ?? '' }}
+                                    {{ $selectedYear }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Semester:</strong></td>
+                                <td>{{ $selectedMonth >= 7 && $selectedMonth <= 12 ? 'Ganjil' : 'Genap' }}</td>
+                            </tr>
+                        @elseif ($selectedPeriode == 'bulanan')
+                            <tr>
+                                <td><strong>Bulan:</strong></td>
+                                <td>{{ $monthOptions[$selectedMonth] ?? '' }} {{ $selectedYear }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Semester:</strong></td>
+                                <td>{{ $selectedMonth >= 7 && $selectedMonth <= 12 ? 'Ganjil' : 'Genap' }}</td>
+                            </tr>
+                        @elseif ($selectedPeriode == 'semesteran')
+                            <tr>
+                                <td><strong>Semester:</strong></td>
+                                <td>{{ ucfirst($selectedSemester) }} {{ $selectedYear }}</td>
+                            </tr>
+                        @endif
+                    </table>
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-sm">
+                        @if ($selectedAnak && !empty($nilaiData))
+                            <tr>
+                                <td><strong>Total Aspek:</strong></td>
+                                <td>{{ count($nilaiData) }} Aspek</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Indikator:</strong></td>
+                                <td>
+                                    @php
+                                        $totalIndikator = 0;
+                                        foreach ($nilaiData as $aspek) {
+                                            $totalIndikator += $aspek->count();
+                                        }
+                                    @endphp
+                                    {{ $totalIndikator }} Indikator
+                                </td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td><strong>Total Anak:</strong></td>
+                                <td>{{ $anakList->count() }} Anak</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    @if ($selectedAnak)
+                                        <span class="badge bg-danger">Data tidak tersedia</span>
+                                    @else
+                                        <span class="badge bg-success">Siap download semua</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endif
+                        <tr>
+                            <td><strong>Tanggal Dibuat:</strong></td>
+                            <td>{{ now()->format('d/m/Y H:i') }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="mb-3"><i class="fas fa-download me-2"></i>Download Laporan</h6>
+                            <div class="d-flex gap-2">
+                                {{-- Download Semua - Only show when no anak selected --}}
+                                @if (
+                                    !$selectedAnak &&
+                                        (($selectedPeriode == 'mingguan' && $selectedWeek && $selectedMonth && $selectedYear) ||
+                                            ($selectedPeriode == 'bulanan' && $selectedMonth && $selectedYear) ||
+                                            ($selectedPeriode == 'semesteran' && $selectedSemester && $selectedYear)))
+                                    <button wire:click="downloadAllPDF" class="btn btn-info">
+                                        <i class="fas fa-download me-2"></i>Download Semua Anak
+                                    </button>
+                                @endif
+
+                                {{-- Download Individual - Only when anak selected and data available --}}
+                                @if ($selectedAnak && !empty($nilaiData))
+                                    <button wire:click="downloadPDF" class="btn btn-success">
+                                        <i class="fas fa-file-pdf me-2"></i>Download
+                                        {{ $anakList->find($selectedAnak)->nama_lengkap ?? 'Anak Ini' }}
+                                    </button>
+                                @endif
+
+                                {{-- Info when no complete filter --}}
+                                @if (
+                                    ($selectedPeriode == 'mingguan' && (!$selectedWeek || !$selectedMonth || !$selectedYear)) ||
+                                        ($selectedPeriode == 'bulanan' && (!$selectedMonth || !$selectedYear)) ||
+                                        ($selectedPeriode == 'semesteran' && (!$selectedSemester || !$selectedYear)))
+                                    <div class="alert alert-warning mb-0 py-2">
+                                        <small><i class="fas fa-info-circle me-1"></i>Lengkapi filter untuk mengaktifkan
+                                            download</small>
+                                    </div>
+                                @endif
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Daftar Nilai Perkembangan Anak</h3>
@@ -43,12 +181,20 @@
 
                 {{-- Filter Mingguan --}}
                 @if ($selectedPeriode == 'mingguan')
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Pilih Minggu</label>
                         <select wire:model.live="selectedWeek" class="form-select">
                             <option value="">-- Pilih Minggu --</option>
                             @foreach ($weekOptions as $weekNumber => $weekLabel)
                                 <option value="{{ $weekNumber }}">{{ $weekLabel }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Bulan</label>
+                        <select wire:model.live="selectedMonth" class="form-select">
+                            @foreach ($monthOptions as $monthNumber => $monthName)
+                                <option value="{{ $monthNumber }}">{{ $monthName }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -100,26 +246,6 @@
                         </select>
                     </div>
                 @endif
-
-                {{-- Download Buttons --}}
-                @if (
-                    ($selectedPeriode == 'mingguan' && $selectedWeek && $selectedYear) ||
-                        ($selectedPeriode == 'bulanan' && $selectedMonth && $selectedYear) ||
-                        ($selectedPeriode == 'semesteran' && $selectedSemester && $selectedYear))
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button wire:click="downloadAllPDF" class="btn btn-info w-100 mt-3">
-                            <i class="fas fa-download me-2"></i>Download Semua
-                        </button>
-                    </div>
-
-                    @if ($selectedAnak && !empty($nilaiData))
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button wire:click="downloadPDF" class="btn btn-success w-100">
-                                <i class="fas fa-download me-2"></i>Download PDF
-                            </button>
-                        </div>
-                    @endif
-                @endif
             </div>
 
             {{-- Data Table --}}
@@ -133,41 +259,20 @@
                                 <tr>
                                     <th colspan="2" rowspan="2">KD & INDIKATOR</th>
                                     <th rowspan="2">CAPAIAN<br>MINGGU INI</th>
+                                    <th rowspan="2">CATATAN</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($nilaiData as $aspekNama => $nilaiAspek)
-                                    @foreach ($nilaiAspek as $index => $nilai)
+                                    <tr>
+                                        <td colspan="4" class="align-middle fw-bold bg-light">
+                                            {{ $aspekNama }}
+                                        </td>
+                                    </tr>
+                                    @foreach ($nilaiAspek as $nilai)
                                         <tr>
-                                            @if ($index == 0)
-                                                <td colspan="3" class="align-middle fw-bold bg-light">
-                                                    {{ $aspekNama }}
-                                                </td>
-                                            @endif
-                                        </tr>
-                                        <tr>
-                                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
-                                            <td>{{ $nilai->indikator->deskripsi }}</td>
-
-                                            {{-- Tampilkan nilai per hari dalam minggu --}}
-                                            {{-- @for ($day = 1; $day <= 5; $day++)
-                                                <td class="text-center">
-                                                    @php
-                                                        // Cari nilai untuk hari tertentu berdasarkan indikator yang sama
-                                                        $nilaiHari = $nilaiAspek
-                                                            ->where('indikator_id', $nilai->indikator_id)
-                                                            ->first();
-                                                    @endphp
-                                                    @if ($nilaiHari)
-                                                        <span
-                                                            class="badge bg-primary">{{ $nilaiMapping[$nilaiHari->nilai_numerik] }}</span>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </td>
-                                            @endfor --}}
-
-                                            {{-- Capaian minggu ini --}}
+                                            <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                                            <td>{{ $nilai->indikator->nama_indikator }}</td>
                                             <td class="text-center">
                                                 @if ($nilai->nilai_numerik)
                                                     <span
@@ -175,6 +280,9 @@
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                <small>{{ $nilai->catatan ?? '-' }}</small>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -185,18 +293,6 @@
 
                     {{-- Tabel Bulanan --}}
                     @if ($selectedPeriode == 'bulanan')
-
-                    {{-- Debug Info --}}
-                        {{-- <div class="alert alert-info">
-                            <strong>Debug Info:</strong><br>
-                            Selected Anak: {{ $selectedAnak }}<br>
-                            Selected Month: {{ $selectedMonth }}<br>
-                            Selected Year: {{ $selectedYear }}<br>
-                            Nilai Data Count: {{ count($nilaiData) }}<br>
-                            @if (!empty($nilaiData))
-                                Aspek: {{ implode(', ', array_keys($nilaiData)) }}
-                            @endif
-                        </div> --}}
                         <table class="table table-bordered table-striped">
                             <thead class="table-dark text-center align-middle">
                                 <tr>
@@ -220,8 +316,8 @@
                                     </tr>
                                     @foreach ($nilaiAspek as $nilai)
                                         <tr>
-                                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
-                                            <td>{{ $nilai->indikator->deskripsi }}</td>
+                                            <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                                            <td>{{ $nilai->indikator->nama_indikator }}</td>
 
                                             @for ($week = 1; $week <= 4; $week++)
                                                 <td class="text-center">
@@ -234,7 +330,6 @@
                                                 </td>
                                             @endfor
 
-                                            {{-- Capaian akhir bulan --}}
                                             <td class="text-center">
                                                 @if ($nilai->capaian_akhir_bulan)
                                                     <span
@@ -277,7 +372,6 @@
                                     @endif
                                 </tr>
                             </thead>
-
                             <tbody>
                                 @foreach ($nilaiData as $aspekNama => $nilaiAspek)
                                     <tr>
@@ -287,8 +381,8 @@
                                     </tr>
                                     @foreach ($nilaiAspek as $nilai)
                                         <tr>
-                                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
-                                            <td>{{ $nilai->indikator->deskripsi }}</td>
+                                            <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                                            <td>{{ $nilai->indikator->nama_indikator }}</td>
 
                                             @php
                                                 $months =
@@ -308,7 +402,6 @@
                                                 </td>
                                             @endforeach
 
-                                            {{-- Capaian akhir semester --}}
                                             <td class="text-center">
                                                 @if ($nilai->capaian_akhir_semester)
                                                     <span
@@ -328,6 +421,16 @@
                 <div class="text-center py-5">
                     <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
                     <p class="text-muted">Tidak ada data nilai untuk periode yang dipilih</p>
+                    <small class="text-muted">
+                        Pastikan data sudah diinput untuk:
+                        @if ($selectedPeriode == 'mingguan')
+                            Minggu {{ $selectedWeek }}, {{ $monthOptions[$selectedMonth] ?? '' }} {{ $selectedYear }}
+                        @elseif ($selectedPeriode == 'bulanan')
+                            {{ $monthOptions[$selectedMonth] ?? '' }} {{ $selectedYear }}
+                        @else
+                            Semester {{ ucfirst($selectedSemester) }} {{ $selectedYear }}
+                        @endif
+                    </small>
                 </div>
             @else
                 <div class="text-center py-5">
@@ -360,7 +463,7 @@
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2 text-muted">Memuat data...</p>
+                <p class="mt-2 text-muted">Memuat data dari JSON structure...</p>
             </div>
 
             {{-- Download Loading Indicator --}}
@@ -376,73 +479,6 @@
 
         </div>
     </div>
-
-    {{-- Additional Information Card --}}
-    @if ($selectedAnak && !empty($nilaiData))
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Informasi Laporan
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <table class="table table-sm">
-                            <tr>
-                                <td><strong>Nama Anak:</strong></td>
-                                <td>{{ $anakList->find($selectedAnak)->nama_lengkap ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Periode:</strong></td>
-                                <td>{{ ucfirst($selectedPeriode) }}</td>
-                            </tr>
-                            @if ($selectedPeriode == 'mingguan')
-                                <tr>
-                                    <td><strong>Minggu:</strong></td>
-                                    <td>Minggu ke-{{ $selectedWeek }} Tahun {{ $selectedYear }}</td>
-                                </tr>
-                            @elseif ($selectedPeriode == 'bulanan')
-                                <tr>
-                                    <td><strong>Bulan:</strong></td>
-                                    <td>{{ $monthOptions[$selectedMonth] ?? '' }} {{ $selectedYear }}</td>
-                                </tr>
-                            @elseif ($selectedPeriode == 'semesteran')
-                                <tr>
-                                    <td><strong>Semester:</strong></td>
-                                    <td>{{ ucfirst($selectedSemester) }} {{ $selectedYear }}</td>
-                                </tr>
-                            @endif
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <table class="table table-sm">
-                            <tr>
-                                <td><strong>Total Aspek:</strong></td>
-                                <td>{{ count($nilaiData) }} Aspek</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total Indikator:</strong></td>
-                                <td>
-                                    @php
-                                        $totalIndikator = 0;
-                                        foreach ($nilaiData as $aspek) {
-                                            $totalIndikator += $aspek->count();
-                                        }
-                                    @endphp
-                                    {{ $totalIndikator }} Indikator
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Tanggal Generate:</strong></td>
-                                <td>{{ now()->format('d/m/Y H:i') }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
 
     {{-- Quick Actions Card --}}
     @if ($selectedAnak)
@@ -471,6 +507,54 @@
                             class="btn btn-outline-success w-100 mb-2 {{ $selectedPeriode == 'semesteran' ? 'active' : '' }}">
                             <i class="fas fa-calendar me-2"></i>Laporan Semesteran
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Debug Info (Development Only) --}}
+    @if (config('app.debug') && $selectedAnak)
+        <div class="card mt-4 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                    <i class="fas fa-bug"></i> Debug Info (Development Only)
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <small>
+                            <strong>Selected Values:</strong><br>
+                            Anak ID: {{ $selectedAnak }}<br>
+                            Periode: {{ $selectedPeriode }}<br>
+                            @if ($selectedPeriode == 'mingguan')
+                                Minggu: {{ $selectedWeek }}<br>
+                                Bulan: {{ $selectedMonth }}<br>
+                            @elseif ($selectedPeriode == 'bulanan')
+                                Bulan: {{ $selectedMonth }}<br>
+                            @else
+                                Semester: {{ $selectedSemester }}<br>
+                            @endif
+                            Tahun: {{ $selectedYear }}
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small>
+                            <strong>Data Structure:</strong><br>
+                            Total Aspek: {{ count($nilaiData) }}<br>
+                            @if (!empty($nilaiData))
+                                Aspek Names: {{ implode(', ', array_keys($nilaiData)) }}<br>
+                            @endif
+                            JSON Path:
+                            @if ($selectedPeriode == 'mingguan')
+                                semester_{{ $selectedMonth >= 7 && $selectedMonth <= 12 ? 'ganjil' : 'genap' }}.aspek_X.indikator_Y.bulan_{{ $selectedMonth }}.minggu_{{ $selectedWeek }}
+                            @elseif ($selectedPeriode == 'bulanan')
+                                semester_{{ $selectedMonth >= 7 && $selectedMonth <= 12 ? 'ganjil' : 'genap' }}.aspek_X.indikator_Y.bulan_{{ $selectedMonth }}.minggu_1-4
+                            @else
+                                semester_{{ $selectedSemester }}.aspek_X.indikator_Y.bulan_1-12.minggu_1-4
+                            @endif
+                        </small>
                     </div>
                 </div>
             </div>

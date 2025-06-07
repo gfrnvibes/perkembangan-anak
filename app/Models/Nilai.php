@@ -2,44 +2,82 @@
 
 namespace App\Models;
 
+use App\Models\Anak;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Nilai extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'anak_id',
-        'indikator_id', 
-        'nilai_numerik',
-        'minggu',
-        'bulan',
-        'tahun'
+        'tahun',
+        'nilai_data',
+        'catatan_data'
     ];
 
-    public function anak(): BelongsTo
+    protected $casts = [
+        'nilai_data' => 'array',
+        'catatan_data' => 'array'
+    ];
+
+    // Relasi: Nilai belongs to Anak
+    public function anak()
     {
         return $this->belongsTo(Anak::class);
     }
 
-    public function indikator(): BelongsTo
+    // Helper method untuk set nilai
+    public function setNilai($aspekId, $indikatorId, $semester, $bulan, $minggu, $nilai)
     {
-        return $this->belongsTo(Indikator::class);
+        $nilaiData = $this->nilai_data ?? [];
+        $nilaiData["semester_{$semester}"]["aspek_{$aspekId}"]["indikator_{$indikatorId}"]["bulan_{$bulan}"]["minggu_{$minggu}"] = $nilai;
+        $this->nilai_data = $nilaiData;
+        return $this;
     }
 
-    public function catatanAnak(): HasOne
+    // Helper method untuk get nilai
+    public function getNilai($aspekId, $indikatorId, $semester, $bulan, $minggu)
     {
-        return $this->hasOne(CatatanAnak::class);
+        return $this->nilai_data["semester_{$semester}"]["aspek_{$aspekId}"]["indikator_{$indikatorId}"]["bulan_{$bulan}"]["minggu_{$minggu}"] ?? null;
     }
 
-    // Method untuk mendapatkan template catatan berdasarkan nilai
-    public function getTemplateCatatan()
+    // Helper method untuk set catatan
+    public function setCatatan($aspekId, $indikatorId, $semester, $bulan, $minggu, $catatan)
     {
-        $nilaiMapping = [1 => 'BB', 2 => 'MB', 3 => 'BSH', 4 => 'BSB'];
-        $nilaiKode = $nilaiMapping[$this->nilai_numerik];
+        $catatanData = $this->catatan_data ?? [];
+        $catatanData["semester_{$semester}"]["aspek_{$aspekId}"]["indikator_{$indikatorId}"]["bulan_{$bulan}"]["minggu_{$minggu}"] = $catatan;
+        $this->catatan_data = $catatanData;
+        return $this;
+    }
+
+    // Helper method untuk get catatan
+    public function getCatatan($aspekId, $indikatorId, $semester, $bulan, $minggu)
+    {
+        return $this->catatan_data["semester_{$semester}"]["aspek_{$aspekId}"]["indikator_{$indikatorId}"]["bulan_{$bulan}"]["minggu_{$minggu}"] ?? null;
+    }
+
+    // Helper method untuk mendapatkan semua aspek yang ada
+    public function getAspekIds($semester = null)
+    {
+        if (!$this->nilai_data) return [];
         
-        return TemplateCatatan::where('indikator_id', $this->indikator_id)
-            ->where('nilai', $nilaiKode)
-            ->first();
+        if ($semester) {
+            $semesterData = $this->nilai_data["semester_{$semester}"] ?? [];
+            return array_map(function($key) {
+                return str_replace('aspek_', '', $key);
+            }, array_keys($semesterData));
+        }
+        
+        $aspekIds = [];
+        foreach (['ganjil', 'genap'] as $sem) {
+            $semesterData = $this->nilai_data["semester_{$sem}"] ?? [];
+            foreach (array_keys($semesterData) as $key) {
+                $aspekIds[] = str_replace('aspek_', '', $key);
+            }
+        }
+        
+        return array_unique($aspekIds);
     }
 }

@@ -5,15 +5,13 @@ namespace App\Livewire\Admin\Nilai;
 use ZipArchive;
 use Carbon\Carbon;
 use App\Models\Anak;
-use App\Models\Aspek;
 use App\Models\Nilai;
+use App\Models\Aspek;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Layout;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 #[Title('Daftar Nilai')]
 #[Layout('layouts.master')]
@@ -48,9 +46,7 @@ class DaftarNilai extends Component
 
     public function getCurrentWeek()
     {
-        $today = Carbon::now();
-        $startOfWeek = $today->copy()->startOfWeek(Carbon::MONDAY);
-        return $startOfWeek->weekOfYear;
+        return 1; // Default minggu 1
     }
 
     public function getCurrentSemester()
@@ -111,100 +107,122 @@ class DaftarNilai extends Component
 
     private function getNilaiMingguan()
     {
-        if (!$this->selectedWeek || !$this->selectedYear) {
+        if (!$this->selectedWeek || !$this->selectedYear || !$this->selectedMonth) {
             return [];
         }
 
-        $nilaiData = Nilai::with(['indikator.aspek', 'catatanAnak.templateCatatan'])
-            ->where('anak_id', $this->selectedAnak)
-            ->where('minggu', $this->selectedWeek)
+        // Ambil data nilai dari JSON structure
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)
             ->where('tahun', $this->selectedYear)
-            ->orderBy('created_at')
-            ->get();
+            ->first();
 
-        // Group by aspek
+        if (!$nilaiRecord) {
+            return [];
+        }
+
+        $nilaiData = $nilaiRecord->nilai_data ?? [];
+        $catatanData = $nilaiRecord->catatan_data ?? [];
+        
+        // Tentukan semester berdasarkan bulan
+        $semesterKey = $this->selectedMonth >= 7 && $this->selectedMonth <= 12 ? 'semester_ganjil' : 'semester_genap';
+        $bulanKey = "bulan_{$this->selectedMonth}";
+        $mingguKey = "minggu_{$this->selectedWeek}";
+
+        // Ambil semua aspek dengan indikator
+        $aspeks = Aspek::with('indikators')->get();
         $result = [];
-        foreach ($nilaiData as $nilai) {
-            $aspekNama = $nilai->indikator->aspek->nama_aspek;
+
+        foreach ($aspeks as $aspek) {
+            $aspekKey = "aspek_{$aspek->id}";
+            $aspekNama = $aspek->nama_aspek;
+            
             if (!isset($result[$aspekNama])) {
                 $result[$aspekNama] = collect();
             }
-            $result[$aspekNama]->push($nilai);
+
+            foreach ($aspek->indikators as $indikator) {
+                $indikatorKey = "indikator_{$indikator->id}";
+                
+                // Ambil nilai dari JSON structure
+                $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
+                $catatan = $catatanData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
+
+                if ($nilai) {
+                    // Buat object nilai
+                    $nilaiObj = new \stdClass();
+                    $nilaiObj->indikator = $indikator;
+                    $nilaiObj->nilai_numerik = $nilai;
+                    $nilaiObj->catatan = $catatan;
+
+                    $result[$aspekNama]->push($nilaiObj);
+                }
+            }
         }
 
         return $result;
     }
 
-private function getNilaiBulanan()
-{
-    if (!$this->selectedMonth || !$this->selectedYear) {
-        return [];
-    }
-
-    // Ambil nilai tertinggi per indikator per minggu dalam bulan tersebut
-    $nilaiPerMinggu = [];
-
-    // Cari semua nilai dalam bulan yang dipilih
-    $nilaiData = Nilai::with(['indikator.aspek', 'catatanAnak.templateCatatan'])
-        ->where('anak_id', $this->selectedAnak)
-        ->where('bulan', $this->selectedMonth)
-        ->where('tahun', $this->selectedYear)
-        ->get();
-
-    // Debug: tambahkan ini untuk melihat data yang ditemukan
-    Log::info('Data nilai ditemukan:', [
-        'count' => $nilaiData->count(),
-        'anak_id' => $this->selectedAnak,
-        'bulan' => $this->selectedMonth,
-        'tahun' => $this->selectedYear,
-        'data' => $nilaiData->toArray()
-    ]);
-
-    // Group by minggu dan indikator, ambil nilai tertinggi
-    foreach ($nilaiData as $nilai) {
-        $indikatorId = $nilai->indikator_id;
-        $minggu = $nilai->minggu; // Gunakan field minggu langsung dari database
-        
-        if (!isset($nilaiPerMinggu[$indikatorId])) {
-            $nilaiPerMinggu[$indikatorId] = [];
+    private function getNilaiBulanan()
+    {
+        if (!$this->selectedMonth || !$this->selectedYear) {
+            return [];
         }
+
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)
+            ->where('tahun', $this->selectedYear)
+            ->first();
+
+        if (!$nilaiRecord) {
+            return [];
+        }
+
+        $nilaiData = $nilaiRecord->nilai_data ?? [];
         
-        // Pastikan minggu dalam range 1-4
-        if ($minggu >= 1 && $minggu <= 4) {
-            $mingguKey = "minggu_$minggu";
+        // Tentukan semester berdasarkan bulan
+        $semesterKey = $this->selectedMonth >= 7 && $this->selectedMonth <= 12 ? 'semester_ganjil' : 'semester_genap';
+        $bulanKey = "bulan_{$this->selectedMonth}";
+
+        $aspeks = Aspek::with('indikators')->get();
+        $result = [];
+
+        foreach ($aspeks as $aspek) {
+            $aspekKey = "aspek_{$aspek->id}";
+            $aspekNama = $aspek->nama_aspek;
             
-            // Ambil nilai tertinggi jika ada multiple nilai untuk minggu yang sama
-            if (!isset($nilaiPerMinggu[$indikatorId][$mingguKey]) || 
-                $nilai->nilai_numerik > $nilaiPerMinggu[$indikatorId][$mingguKey]) {
-                $nilaiPerMinggu[$indikatorId][$mingguKey] = $nilai->nilai_numerik;
-            }
-        }
-    }
-
-    // Format data untuk tampilan
-    $result = [];
-    foreach ($nilaiPerMinggu as $indikatorId => $mingguData) {
-        $indikator = \App\Models\Indikator::with('aspek')->find($indikatorId);
-        if ($indikator) {
-            $aspekNama = $indikator->aspek->nama_aspek;
             if (!isset($result[$aspekNama])) {
                 $result[$aspekNama] = collect();
             }
 
-            $nilaiObj = new \stdClass();
-            $nilaiObj->indikator = $indikator;
-            $nilaiObj->minggu_data = $mingguData;
-            
-            // Hitung capaian akhir bulan (nilai tertinggi dari semua minggu)
-            $nilaiObj->capaian_akhir_bulan = !empty($mingguData) ? max($mingguData) : null;
+            foreach ($aspek->indikators as $indikator) {
+                $indikatorKey = "indikator_{$indikator->id}";
+                
+                $mingguData = [];
+                $nilaiTertinggi = 0;
 
-            $result[$aspekNama]->push($nilaiObj);
+                // Ambil data untuk 4 minggu
+                for ($minggu = 1; $minggu <= 4; $minggu++) {
+                    $mingguKey = "minggu_{$minggu}";
+                    $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
+                    
+                    if ($nilai) {
+                        $mingguData[$mingguKey] = $nilai;
+                        $nilaiTertinggi = max($nilaiTertinggi, $nilai);
+                    }
+                }
+
+                if (!empty($mingguData)) {
+                    $nilaiObj = new \stdClass();
+                    $nilaiObj->indikator = $indikator;
+                    $nilaiObj->minggu_data = $mingguData;
+                    $nilaiObj->capaian_akhir_bulan = $nilaiTertinggi ?: null;
+
+                    $result[$aspekNama]->push($nilaiObj);
+                }
+            }
         }
+
+        return $result;
     }
-
-    return $result;
-}
-
 
     private function getNilaiSemesteran()
     {
@@ -212,53 +230,65 @@ private function getNilaiBulanan()
             return [];
         }
 
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)
+            ->where('tahun', $this->selectedYear)
+            ->first();
+
+        if (!$nilaiRecord) {
+            return [];
+        }
+
+        $nilaiData = $nilaiRecord->nilai_data ?? [];
+        $semesterKey = "semester_{$this->selectedSemester}";
+
         // Tentukan bulan berdasarkan semester
-        if ($this->selectedSemester == 'ganjil') {
-            $bulanSemester = [7, 8, 9, 10, 11, 12]; // Jul-Des
-        } else {
-            $bulanSemester = [1, 2, 3, 4, 5, 6]; // Jan-Jun
-        }
+        $bulanSemester = $this->selectedSemester == 'ganjil' 
+            ? [7, 8, 9, 10, 11, 12] 
+            : [1, 2, 3, 4, 5, 6];
 
-        // Ambil nilai tertinggi per indikator per bulan
-        $nilaiPerBulan = [];
-
-        foreach ($bulanSemester as $bulan) {
-            $nilaiBulanIni = Nilai::with(['indikator.aspek', 'catatanAnak.templateCatatan'])
-                ->where('anak_id', $this->selectedAnak)
-                ->where('bulan', $bulan)
-                ->where('tahun', $this->selectedYear)
-                ->select('indikator_id', DB::raw('MAX(nilai_numerik) as nilai_tertinggi'))
-                ->groupBy('indikator_id')
-                ->get();
-
-            foreach ($nilaiBulanIni as $nilai) {
-                $indikatorId = $nilai->indikator_id;
-                if (!isset($nilaiPerBulan[$indikatorId])) {
-                    $nilaiPerBulan[$indikatorId] = [];
-                }
-                $bulanName = Carbon::create($this->selectedYear, $bulan, 1)->format('M');
-                $nilaiPerBulan[$indikatorId][$bulanName] = $nilai->nilai_tertinggi;
-            }
-        }
-
-        // Format data untuk tampilan
+        $aspeks = Aspek::with('indikators')->get();
         $result = [];
-        foreach ($nilaiPerBulan as $indikatorId => $bulanData) {
-            $indikator = \App\Models\Indikator::with('aspek')->find($indikatorId);
-            if ($indikator) {
-                $aspekNama = $indikator->aspek->nama_aspek;
-                if (!isset($result[$aspekNama])) {
-                    $result[$aspekNama] = collect();
+
+        foreach ($aspeks as $aspek) {
+            $aspekKey = "aspek_{$aspek->id}";
+            $aspekNama = $aspek->nama_aspek;
+            
+            if (!isset($result[$aspekNama])) {
+                $result[$aspekNama] = collect();
+            }
+
+            foreach ($aspek->indikators as $indikator) {
+                $indikatorKey = "indikator_{$indikator->id}";
+                
+                $bulanData = [];
+                $nilaiTertinggi = 0;
+
+                foreach ($bulanSemester as $bulan) {
+                    $bulanKey = "bulan_{$bulan}";
+                    $bulanName = Carbon::create($this->selectedYear, $bulan, 1)->format('M');
+                    
+                    // Cari nilai tertinggi dalam bulan ini
+                    $nilaiTertinggiBulan = 0;
+                    for ($minggu = 1; $minggu <= 4; $minggu++) {
+                        $mingguKey = "minggu_{$minggu}";
+                        $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? 0;
+                        $nilaiTertinggiBulan = max($nilaiTertinggiBulan, $nilai);
+                    }
+                    
+                    if ($nilaiTertinggiBulan > 0) {
+                        $bulanData[$bulanName] = $nilaiTertinggiBulan;
+                        $nilaiTertinggi = max($nilaiTertinggi, $nilaiTertinggiBulan);
+                    }
                 }
 
-                $nilaiObj = new \stdClass();
-                $nilaiObj->indikator = $indikator;
-                $nilaiObj->bulan_data = $bulanData;
+                if (!empty($bulanData)) {
+                    $nilaiObj = new \stdClass();
+                    $nilaiObj->indikator = $indikator;
+                    $nilaiObj->bulan_data = $bulanData;
+                    $nilaiObj->capaian_akhir_semester = $nilaiTertinggi ?: null;
 
-                // Hitung capaian akhir semester (nilai tertinggi dari semua bulan)
-                $nilaiObj->capaian_akhir_semester = !empty($bulanData) ? max($bulanData) : null;
-
-                $result[$aspekNama]->push($nilaiObj);
+                    $result[$aspekNama]->push($nilaiObj);
+                }
             }
         }
 
@@ -285,7 +315,6 @@ private function getNilaiBulanan()
         ];
 
         $pdf = PDF::loadView('livewire.admin.nilai.laporan-nilai', $data);
-
         $filename = $this->generateFilename($anak);
 
         return response()->streamDownload(function () use ($pdf) {
@@ -312,7 +341,6 @@ private function getNilaiBulanan()
 
         if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
             foreach ($anakList as $anak) {
-                // Generate data nilai untuk setiap anak secara langsung
                 $nilaiData = $this->generateNilaiDataForAnak($anak->id);
 
                 if (!empty($nilaiData)) {
@@ -344,171 +372,28 @@ private function getNilaiBulanan()
 
     private function generateNilaiDataForAnak($anakId)
     {
-        switch ($this->selectedPeriode) {
-            case 'mingguan':
-                return $this->getNilaiMingguanForAnak($anakId);
-            case 'bulanan':
-                return $this->getNilaiBulananForAnak($anakId);
-            case 'semesteran':
-                return $this->getNilaiSemesteranForAnak($anakId);
-            default:
-                return [];
-        }
-    }
-
-    private function getNilaiMingguanForAnak($anakId)
-    {
-        if (!$this->selectedWeek || !$this->selectedYear) {
-            return [];
-        }
-
-        $nilaiData = Nilai::with(['indikator.aspek', 'catatanAnak.templateCatatan'])
-            ->where('anak_id', $anakId)
-            ->where('minggu', $this->selectedWeek)
-            ->where('tahun', $this->selectedYear)
-            ->orderBy('created_at')
-            ->get();
-
-        // Group by aspek
-        $result = [];
-        foreach ($nilaiData as $nilai) {
-            $aspekNama = $nilai->indikator->aspek->nama_aspek;
-            if (!isset($result[$aspekNama])) {
-                $result[$aspekNama] = collect();
-            }
-            $result[$aspekNama]->push($nilai);
-        }
-
-        return $result;
-    }
-
-private function getNilaiBulananForAnak($anakId)
-{
-    if (!$this->selectedMonth || !$this->selectedYear) {
-        return [];
-    }
-
-    $nilaiPerMinggu = [];
-
-    // Cari semua nilai dalam bulan yang dipilih
-    $nilaiData = Nilai::with(['indikator.aspek', 'catatanAnak.templateCatatan'])
-        ->where('anak_id', $anakId)
-        ->where('bulan', $this->selectedMonth)
-        ->where('tahun', $this->selectedYear)
-        ->get();
-
-    // Group by minggu dan indikator, ambil nilai tertinggi
-    foreach ($nilaiData as $nilai) {
-        $indikatorId = $nilai->indikator_id;
-        $minggu = $nilai->minggu;
+        $originalSelectedAnak = $this->selectedAnak;
+        $this->selectedAnak = $anakId;
         
-        if (!isset($nilaiPerMinggu[$indikatorId])) {
-            $nilaiPerMinggu[$indikatorId] = [];
-        }
+        $result = match($this->selectedPeriode) {
+            'mingguan' => $this->getNilaiMingguan(),
+            'bulanan' => $this->getNilaiBulanan(),
+            'semesteran' => $this->getNilaiSemesteran(),
+            default => []
+        };
         
-        // Pastikan minggu dalam range 1-4
-        if ($minggu >= 1 && $minggu <= 4) {
-            $mingguKey = "minggu_$minggu";
-            
-            // Ambil nilai tertinggi jika ada multiple nilai untuk minggu yang sama
-            if (!isset($nilaiPerMinggu[$indikatorId][$mingguKey]) || 
-                $nilai->nilai_numerik > $nilaiPerMinggu[$indikatorId][$mingguKey]) {
-                $nilaiPerMinggu[$indikatorId][$mingguKey] = $nilai->nilai_numerik;
-            }
-        }
-    }
-
-    $result = [];
-    foreach ($nilaiPerMinggu as $indikatorId => $mingguData) {
-        $indikator = \App\Models\Indikator::with('aspek')->find($indikatorId);
-        if ($indikator) {
-            $aspekNama = $indikator->aspek->nama_aspek;
-            if (!isset($result[$aspekNama])) {
-                $result[$aspekNama] = collect();
-            }
-
-            $nilaiObj = new \stdClass();
-            $nilaiObj->indikator = $indikator;
-            $nilaiObj->minggu_data = $mingguData;
-            $nilaiObj->capaian_akhir_bulan = !empty($mingguData) ? max($mingguData) : null;
-
-            $result[$aspekNama]->push($nilaiObj);
-        }
-    }
-
-    return $result;
-}
-
-
-    private function getNilaiSemesteranForAnak($anakId)
-    {
-        if (!$this->selectedSemester || !$this->selectedYear) {
-            return [];
-        }
-
-        // Tentukan bulan berdasarkan semester
-        if ($this->selectedSemester == 'ganjil') {
-            $bulanSemester = [7, 8, 9, 10, 11, 12]; // Jul-Des
-        } else {
-            $bulanSemester = [1, 2, 3, 4, 5, 6]; // Jan-Jun
-        }
-
-        $nilaiPerBulan = [];
-
-        foreach ($bulanSemester as $bulan) {
-            $nilaiBulanIni = Nilai::with(['indikator.aspek', 'catatanAnak.templateCatatan'])
-                ->where('anak_id', $anakId)
-                ->where('bulan', $bulan)
-                ->where('tahun', $this->selectedYear)
-                ->select('indikator_id', DB::raw('MAX(nilai_numerik) as nilai_tertinggi'))
-                ->groupBy('indikator_id')
-                ->get();
-
-            foreach ($nilaiBulanIni as $nilai) {
-                $indikatorId = $nilai->indikator_id;
-                if (!isset($nilaiPerBulan[$indikatorId])) {
-                    $nilaiPerBulan[$indikatorId] = [];
-                }
-                $bulanName = Carbon::create($this->selectedYear, $bulan, 1)->format('M');
-                $nilaiPerBulan[$indikatorId][$bulanName] = $nilai->nilai_tertinggi;
-            }
-        }
-
-        $result = [];
-        foreach ($nilaiPerBulan as $indikatorId => $bulanData) {
-            $indikator = \App\Models\Indikator::with('aspek')->find($indikatorId);
-            if ($indikator) {
-                $aspekNama = $indikator->aspek->nama_aspek;
-                if (!isset($result[$aspekNama])) {
-                    $result[$aspekNama] = collect();
-                }
-
-                $nilaiObj = new \stdClass();
-                $nilaiObj->indikator = $indikator;
-                $nilaiObj->bulan_data = $bulanData;
-                $nilaiObj->capaian_akhir_semester = !empty($bulanData) ? max($bulanData) : null;
-
-                $result[$aspekNama]->push($nilaiObj);
-            }
-        }
-
+        $this->selectedAnak = $originalSelectedAnak;
         return $result;
     }
 
     private function generateFilename($anak)
     {
-        $periode = '';
-        switch ($this->selectedPeriode) {
-            case 'mingguan':
-                $periode = 'Mingguan_Minggu' . $this->selectedWeek . '_' . $this->selectedYear;
-                break;
-            case 'bulanan':
-                $periode = 'Bulanan_' . Carbon::create($this->selectedYear, $this->selectedMonth)->format('m-Y');
-                break;
-            case 'semesteran':
-                $periode = 'Semester_' . ucfirst($this->selectedSemester) . '_' . $this->selectedYear;
-                break;
-        }
+        $periode = match($this->selectedPeriode) {
+            'mingguan' => 'Mingguan_Minggu' . $this->selectedWeek . '_' . Carbon::create($this->selectedYear, $this->selectedMonth)->format('m-Y'),
+            'bulanan' => 'Bulanan_' . Carbon::create($this->selectedYear, $this->selectedMonth)->format('m-Y'),
+            'semesteran' => 'Semester_' . ucfirst($this->selectedSemester) . '_' . $this->selectedYear,
+            default => 'Unknown'
+        };
 
         return 'Laporan_Nilai_' . str_replace(' ', '_', $anak->nama_lengkap) . '_' . $periode . '.pdf';
     }
@@ -516,7 +401,6 @@ private function getNilaiBulananForAnak($anakId)
     public function getWeekOptions()
     {
         $weeks = [];
-        // Generate minggu 1-4
         for ($week = 1; $week <= 4; $week++) {
             $weeks[$week] = "Minggu ke-$week";
         }
@@ -526,18 +410,9 @@ private function getNilaiBulananForAnak($anakId)
     public function getMonthOptions()
     {
         return [
-            1 => 'Januari',
-            2 => 'Februari',
-            3 => 'Maret',
-            4 => 'April',
-            5 => 'Mei',
-            6 => 'Juni',
-            7 => 'Juli',
-            8 => 'Agustus',
-            9 => 'September',
-            10 => 'Oktober',
-            11 => 'November',
-            12 => 'Desember',
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
     }
 

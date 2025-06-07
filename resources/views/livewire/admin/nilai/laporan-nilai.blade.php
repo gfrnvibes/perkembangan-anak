@@ -196,8 +196,8 @@
                     </tr>
                     @foreach ($nilaiAspek as $nilai)
                         <tr>
-                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
-                            <td class="text-left">{{ $nilai->indikator->deskripsi }}</td>
+                            <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                            <td class="text-left">{{ $nilai->indikator->nama_indikator }}</td>
                             <td class="text-center">
                                 @if ($nilai->nilai_numerik)
                                     {{ $nilaiMapping[$nilai->nilai_numerik] }}
@@ -217,7 +217,7 @@
                 <tr>
                     <th rowspan="2" colspan="2">KD & INDIKATOR</th>
                     <th colspan="4">MINGGU KE</th>
-                    <th rowspan="2">CAPAIAN<br>AKHIR BLN</th>
+                    <th rowspan="2">CAPAIAN<br>AKHIR BULAN</th>
                 </tr>
                 <tr>
                     <th>Minggu 1</th>
@@ -235,8 +235,8 @@
                     </tr>
                     @foreach ($nilaiAspek as $nilai)
                         <tr>
-                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
-                            <td class="text-left">{{ $nilai->indikator->deskripsi }}</td>
+                            <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                            <td class="text-left">{{ $nilai->indikator->nama_indikator }}</td>
 
                             @for ($week = 1; $week <= 4; $week++)
                                 <td class="text-center">
@@ -296,8 +296,8 @@
                     </tr>
                     @foreach ($nilaiAspek as $nilai)
                         <tr>
-                            <td class="text-center">{{ $nilai->indikator->kode_indikator }}</td>
-                            <td class="text-left">{{ $nilai->indikator->deskripsi }}</td>
+                            <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                            <td class="text-left">{{ $nilai->indikator->nama_indikator }}</td>
 
                             @php
                                 $months =

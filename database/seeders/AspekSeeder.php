@@ -17,32 +17,32 @@ class AspekSeeder extends Seeder
         [
             [
                 'id' => 1,
-                'kode_aspek' => 'NAM',
+                // 'kode_aspek' => 'NAM',
                 'nama_aspek' => 'Perkembangan Nilai Agama dan Moral'
             ],
             [
                 'id' => 2, 
-                'kode_aspek' => 'Motorik',
+                // 'kode_aspek' => 'Motorik',
                 'nama_aspek' => 'Perkembangan Fisik Motorik'
             ], 
             [
                 'id' => 3, 
-                'kode_aspek' => 'Kog',
+                // 'kode_aspek' => 'Kog',
                 'nama_aspek' => 'Perkembangan Kognitif'
             ], 
             [
                 'id' => 4, 
-                'kode_aspek' => 'Bahasa',
+                // 'kode_aspek' => 'Bahasa',
                 'nama_aspek' => 'Perkembangan Bahasa'
             ], 
             [
                 'id' => 5, 
-                'kode_aspek' => 'SosEm',
+                // 'kode_aspek' => 'SosEm',
                 'nama_aspek' => 'Perkembangan Sosial Emosional'
             ],
             [
                 'id' => 6,
-                'kode_aspek' => 'Seni',
+                // 'kode_aspek' => 'Seni',
                 'nama_aspek' => 'Perkembangan Seni'
             ]
         ]);
