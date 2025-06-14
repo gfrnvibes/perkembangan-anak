@@ -2,7 +2,7 @@
     <div class="card">
         <div class="card-header fw-bold">
             <h3 class="card-title">
-                Input Nilai Perkembangan Anak (Mingguan) - Ultra Optimized
+                Input Nilai Perkembangan Anak (Mingguan)
             </h3>
         </div>
         <div class="card-body p-4">

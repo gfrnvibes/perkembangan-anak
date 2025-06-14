@@ -28,8 +28,9 @@
     
     <title>{{ $title ?? 'Page Title' }}</title>
     {{-- <script src="{{ asset('assets/libs/chart.js/chart.min.js') }}"></script> --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @stack('scripts')
+    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
+    @livewireStyles
+    @stack('styles')
 </head>
 
 <body>
@@ -72,6 +73,8 @@
     {{-- <script>
         AOS.init();
     </script> --}}
+    @livewireScripts
+    @stack('scripts')
 </body>
 
 </html>

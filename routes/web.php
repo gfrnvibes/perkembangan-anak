@@ -7,6 +7,7 @@ use App\Livewire\Admin\InputNilai;
 use App\Livewire\Auth\Login;
 use App\Livewire\Home;
 use App\Livewire\Perkembangan;
+use App\Livewire\ProfilAnanda;
 use App\Models\Anak;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,7 @@ Route::get('/', Home::class)->name('/');
 
 Route::middleware('auth')->group(function(){
     Route::get('jejak-ananda', Perkembangan::class)->name('perkembangan-ananda');
+    Route::get('profil-ananda', ProfilAnanda::class)->name('profil-ananda');
 });
 
 Route::get('logout', [LogoutController::class, 'logout'])->name('logout');

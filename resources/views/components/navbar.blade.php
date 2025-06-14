@@ -20,7 +20,7 @@
                 @endphp
 
                 <x-nav-link :active="request()->routeIs('perkembangan-ananda')" href="{{ route('perkembangan-ananda') }}"> Jejak Ananda</x-nav-link>
-                <x-nav-link href="">Papan Bintang</x-nav-link>
+                <x-nav-link :active="request()->routeIs('profil-ananda')" href="{{ route('profil-ananda') }}">Profil Ananda</x-nav-link>
             </ul>
             <div class="d-flex gap-2">
                 @guest
