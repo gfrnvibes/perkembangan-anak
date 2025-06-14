@@ -25,11 +25,11 @@ class UserSeeder extends Seeder
         ]);
 
         // Create Regular User
-        $user = User::create([
-            'name' => 'Husni Moh Jaelani',
-            'email' => 'husni@gmail.com',
-            'password' => Hash::make('password'),
-        ]);
+        // $user = User::create([
+        //     'name' => 'Husni Moh Jaelani',
+        //     'email' => 'husni@gmail.com',
+        //     'password' => Hash::make('password'),
+        // ]);
 
         $faker = Faker::create();
 
@@ -51,6 +51,6 @@ class UserSeeder extends Seeder
 
         // Assign roles to users
         $admin->assignRole('admin');
-        $user->assignRole('user');
+        // $user->assignRole('user');
     }
 }

@@ -18,7 +18,7 @@
                         @else
                             <tr>
                                 <td><strong>Mode:</strong></td>
-                                <td><span class="badge bg-info">Download Semua Anak</span></td>
+                                <td><span class="badge bg-info">Download Semua Nilai</span></td>
                             </tr>
                         @endif
                         <tr>
@@ -99,14 +99,41 @@
                             <h6 class="mb-3"><i class="fas fa-download me-2"></i>Download Laporan</h6>
                             <div class="d-flex gap-2">
                                 {{-- Download Semua - Only show when no anak selected --}}
+                                {{-- Update download button logic --}}
                                 @if (
                                     !$selectedAnak &&
                                         (($selectedPeriode == 'mingguan' && $selectedWeek && $selectedMonth && $selectedYear) ||
                                             ($selectedPeriode == 'bulanan' && $selectedMonth && $selectedYear) ||
                                             ($selectedPeriode == 'semesteran' && $selectedSemester && $selectedYear)))
-                                    <button wire:click="downloadAllPDF" class="btn btn-info">
-                                        <i class="fas fa-download me-2"></i>Download Semua Anak
-                                    </button>
+                                    @php
+                                        $totalWithData = \App\Models\Nilai::where('tahun', $selectedYear)
+                                            ->whereNotNull('nilai_data')
+                                            ->where('nilai_data', '!=', '{}')
+                                            ->count();
+                                    @endphp
+
+                                    @if ($totalWithData > 0)
+                                        <button wire:click="downloadAllPDF" class="btn btn-info">
+                                            <i class="fas fa-download me-2"></i>Download Semua Anak
+                                            ({{ $totalWithData }} data)
+                                        </button>
+
+                                        {{-- Tombol Kirim Semua ke Email --}}
+                                        <button wire:click="sendAllPDFtoParents" class="btn btn-primary"
+                                            wire:loading.attr="disabled">
+                                            <span wire:loading.remove wire:target="sendAllPDFtoParents">
+                                                <i class="fas fa-envelope"></i> Kirim Email ke Semua Orang Tua
+                                            </span>
+                                            <span wire:loading wire:target="sendAllPDFtoParents">
+                                                <i class="fas fa-spinner fa-spin"></i> Mengirim...
+                                            </span>
+                                        </button>
+                                    @else
+                                        <div class="alert alert-warning mb-0 py-2">
+                                            <small><i class="fas fa-exclamation-triangle me-1"></i>Tidak ada data untuk
+                                                tahun {{ $selectedYear }}</small>
+                                        </div>
+                                    @endif
                                 @endif
 
                                 {{-- Download Individual - Only when anak selected and data available --}}
@@ -114,6 +141,11 @@
                                     <button wire:click="downloadPDF" class="btn btn-success">
                                         <i class="fas fa-file-pdf me-2"></i>Download
                                         {{ $anakList->find($selectedAnak)->nama_lengkap ?? 'Anak Ini' }}
+                                    </button>
+
+                                    {{-- Tombol Kirim ke Email Orang Tua --}}
+                                    <button wire:click="sendPDFtoParent" class="btn btn-warning">
+                                        <i class="fas fa-envelope me-2"></i>Kirim ke Email Orang Tua
                                     </button>
                                 @endif
 

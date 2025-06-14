@@ -5,13 +5,16 @@ namespace App\Livewire\Admin\Nilai;
 use ZipArchive;
 use Carbon\Carbon;
 use App\Models\Anak;
-use App\Models\Nilai;
 use App\Models\Aspek;
+use App\Models\Nilai;
 use Livewire\Component;
+// use Barryvdh\DomPDF\PDF;
+use App\Mail\LaporanNilaiMail;
 use Livewire\Attributes\Title;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 #[Title('Daftar Nilai')]
 #[Layout('layouts.master')]
@@ -112,9 +115,7 @@ class DaftarNilai extends Component
         }
 
         // Ambil data nilai dari JSON structure
-        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)
-            ->where('tahun', $this->selectedYear)
-            ->first();
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)->where('tahun', $this->selectedYear)->first();
 
         if (!$nilaiRecord) {
             return [];
@@ -122,7 +123,7 @@ class DaftarNilai extends Component
 
         $nilaiData = $nilaiRecord->nilai_data ?? [];
         $catatanData = $nilaiRecord->catatan_data ?? [];
-        
+
         // Tentukan semester berdasarkan bulan
         $semesterKey = $this->selectedMonth >= 7 && $this->selectedMonth <= 12 ? 'semester_ganjil' : 'semester_genap';
         $bulanKey = "bulan_{$this->selectedMonth}";
@@ -135,14 +136,14 @@ class DaftarNilai extends Component
         foreach ($aspeks as $aspek) {
             $aspekKey = "aspek_{$aspek->id}";
             $aspekNama = $aspek->nama_aspek;
-            
+
             if (!isset($result[$aspekNama])) {
                 $result[$aspekNama] = collect();
             }
 
             foreach ($aspek->indikators as $indikator) {
                 $indikatorKey = "indikator_{$indikator->id}";
-                
+
                 // Ambil nilai dari JSON structure
                 $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
                 $catatan = $catatanData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
@@ -168,16 +169,14 @@ class DaftarNilai extends Component
             return [];
         }
 
-        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)
-            ->where('tahun', $this->selectedYear)
-            ->first();
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)->where('tahun', $this->selectedYear)->first();
 
         if (!$nilaiRecord) {
             return [];
         }
 
         $nilaiData = $nilaiRecord->nilai_data ?? [];
-        
+
         // Tentukan semester berdasarkan bulan
         $semesterKey = $this->selectedMonth >= 7 && $this->selectedMonth <= 12 ? 'semester_ganjil' : 'semester_genap';
         $bulanKey = "bulan_{$this->selectedMonth}";
@@ -188,14 +187,14 @@ class DaftarNilai extends Component
         foreach ($aspeks as $aspek) {
             $aspekKey = "aspek_{$aspek->id}";
             $aspekNama = $aspek->nama_aspek;
-            
+
             if (!isset($result[$aspekNama])) {
                 $result[$aspekNama] = collect();
             }
 
             foreach ($aspek->indikators as $indikator) {
                 $indikatorKey = "indikator_{$indikator->id}";
-                
+
                 $mingguData = [];
                 $nilaiTertinggi = 0;
 
@@ -203,7 +202,7 @@ class DaftarNilai extends Component
                 for ($minggu = 1; $minggu <= 4; $minggu++) {
                     $mingguKey = "minggu_{$minggu}";
                     $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
-                    
+
                     if ($nilai) {
                         $mingguData[$mingguKey] = $nilai;
                         $nilaiTertinggi = max($nilaiTertinggi, $nilai);
@@ -230,9 +229,7 @@ class DaftarNilai extends Component
             return [];
         }
 
-        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)
-            ->where('tahun', $this->selectedYear)
-            ->first();
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)->where('tahun', $this->selectedYear)->first();
 
         if (!$nilaiRecord) {
             return [];
@@ -242,9 +239,7 @@ class DaftarNilai extends Component
         $semesterKey = "semester_{$this->selectedSemester}";
 
         // Tentukan bulan berdasarkan semester
-        $bulanSemester = $this->selectedSemester == 'ganjil' 
-            ? [7, 8, 9, 10, 11, 12] 
-            : [1, 2, 3, 4, 5, 6];
+        $bulanSemester = $this->selectedSemester == 'ganjil' ? [7, 8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6];
 
         $aspeks = Aspek::with('indikators')->get();
         $result = [];
@@ -252,21 +247,21 @@ class DaftarNilai extends Component
         foreach ($aspeks as $aspek) {
             $aspekKey = "aspek_{$aspek->id}";
             $aspekNama = $aspek->nama_aspek;
-            
+
             if (!isset($result[$aspekNama])) {
                 $result[$aspekNama] = collect();
             }
 
             foreach ($aspek->indikators as $indikator) {
                 $indikatorKey = "indikator_{$indikator->id}";
-                
+
                 $bulanData = [];
                 $nilaiTertinggi = 0;
 
                 foreach ($bulanSemester as $bulan) {
                     $bulanKey = "bulan_{$bulan}";
                     $bulanName = Carbon::create($this->selectedYear, $bulan, 1)->format('M');
-                    
+
                     // Cari nilai tertinggi dalam bulan ini
                     $nilaiTertinggiBulan = 0;
                     for ($minggu = 1; $minggu <= 4; $minggu++) {
@@ -274,7 +269,7 @@ class DaftarNilai extends Component
                         $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? 0;
                         $nilaiTertinggiBulan = max($nilaiTertinggiBulan, $nilai);
                     }
-                    
+
                     if ($nilaiTertinggiBulan > 0) {
                         $bulanData[$bulanName] = $nilaiTertinggiBulan;
                         $nilaiTertinggi = max($nilaiTertinggi, $nilaiTertinggiBulan);
@@ -370,29 +365,128 @@ class DaftarNilai extends Component
         session()->flash('error', 'Gagal membuat file ZIP');
     }
 
+    public function sendPDFtoParent()
+    {
+        $anak = Anak::find($this->selectedAnak);
+        $parentEmail = $anak->orangTua->email ?? null;
+
+        if (!$parentEmail) {
+            session()->flash('error', 'Email orang tua tidak ditemukan.');
+            return;
+        }
+
+        $pdf = Pdf::loadView('livewire.admin.nilai.laporan-nilai', [
+            'anak' => $anak,
+            'nilaiData' => $this->nilaiData,
+            'periode' => $this->selectedPeriode,
+            'nilaiMapping' => $this->nilaiMapping,
+            'selectedWeek' => $this->selectedWeek,
+            'selectedMonth' => $this->selectedMonth,
+            'selectedYear' => $this->selectedYear,
+            'selectedSemester' => $this->selectedSemester,
+        ]);
+
+        $pdfContent = $pdf->output();
+        $filename = $this->generateFilename($anak);
+
+        $periodeText = '';
+
+        switch ($this->selectedPeriode) {
+            case 'mingguan':
+                $periodeText = 'Mingguan: Minggu ke ' . $this->selectedWeek . ', Bulan ' . $this->selectedMonth . ', Tahun ' . $this->selectedYear;
+                break;
+            case 'bulanan':
+                $periodeText = 'Bulanan: Bulan ' . $this->selectedMonth . ', Tahun ' . $this->selectedYear;
+                break;
+            case 'semesteran':
+                $periodeText = 'Semester: ' . $this->selectedSemester . ', Tahun ' . $this->selectedYear;
+                break;
+        }
+
+        Mail::to($parentEmail)->send(new LaporanNilaiMail($anak, $this->nilaiData, $pdfContent, $filename, $periodeText));
+
+        session()->flash('success', 'Laporan nilai berhasil dikirim ke email orang tua.');
+    }
+
+    public function sendAllPDFtoParents()
+    {
+        $anakList = Anak::all();
+        $successEmails = [];
+        $failedEmails = [];
+
+        foreach ($anakList as $anak) {
+            $parentEmail = $anak->orangTua->email ?? null;
+
+            if ($parentEmail) {
+                $nilaiData = $this->generateNilaiDataForAnak($anak->id);
+
+                if (!empty($nilaiData)) {
+                    $data = [
+                        'anak' => $anak,
+                        'nilaiData' => $nilaiData,
+                        'periode' => $this->selectedPeriode,
+                        'nilaiMapping' => $this->nilaiMapping,
+                        'selectedWeek' => $this->selectedWeek,
+                        'selectedMonth' => $this->selectedMonth,
+                        'selectedYear' => $this->selectedYear,
+                        'selectedSemester' => $this->selectedSemester,
+                    ];
+
+                    $pdf = PDF::loadView('livewire.admin.nilai.laporan-nilai', $data);
+                    $pdfContent = $pdf->output();
+                    $filename = $this->generateFilename($anak);
+
+                    $periodeText = '';
+
+                    switch ($this->selectedPeriode) {
+                        case 'mingguan':
+                            $periodeText = 'Mingguan: Minggu ke ' . $this->selectedWeek . ', Bulan ' . $this->selectedMonth . ', Tahun ' . $this->selectedYear;
+                            break;
+                        case 'bulanan':
+                            $periodeText = 'Bulanan: Bulan ' . $this->selectedMonth . ', Tahun ' . $this->selectedYear;
+                            break;
+                        case 'semesteran':
+                            $periodeText = 'Semester: ' . $this->selectedSemester . ', Tahun ' . $this->selectedYear;
+                            break;
+                    }
+
+                    try {
+                        Mail::to($parentEmail)->send(new LaporanNilaiMail($anak, $nilaiData, $pdfContent, $filename, $periodeText));
+                        $successEmails[] = $parentEmail;
+                    } catch (\Exception $e) {
+                        Log::error('Gagal kirim ke: ' . $parentEmail . ' | Error: ' . $e->getMessage());
+                        $failedEmails[] = $parentEmail;
+                    }
+                }
+            } else {
+                $failedEmails[] = 'Tidak ada email untuk Anak ID: ' . $anak->id;
+            }
+        }
+    }
+
     private function generateNilaiDataForAnak($anakId)
     {
         $originalSelectedAnak = $this->selectedAnak;
         $this->selectedAnak = $anakId;
-        
-        $result = match($this->selectedPeriode) {
+
+        $result = match ($this->selectedPeriode) {
             'mingguan' => $this->getNilaiMingguan(),
             'bulanan' => $this->getNilaiBulanan(),
             'semesteran' => $this->getNilaiSemesteran(),
-            default => []
+            default => [],
         };
-        
+
         $this->selectedAnak = $originalSelectedAnak;
         return $result;
     }
 
     private function generateFilename($anak)
     {
-        $periode = match($this->selectedPeriode) {
+        $periode = match ($this->selectedPeriode) {
             'mingguan' => 'Mingguan_Minggu' . $this->selectedWeek . '_' . Carbon::create($this->selectedYear, $this->selectedMonth)->format('m-Y'),
             'bulanan' => 'Bulanan_' . Carbon::create($this->selectedYear, $this->selectedMonth)->format('m-Y'),
             'semesteran' => 'Semester_' . ucfirst($this->selectedSemester) . '_' . $this->selectedYear,
-            default => 'Unknown'
+            default => 'Unknown',
         };
 
         return 'Laporan_Nilai_' . str_replace(' ', '_', $anak->nama_lengkap) . '_' . $periode . '.pdf';
@@ -410,9 +504,18 @@ class DaftarNilai extends Component
     public function getMonthOptions()
     {
         return [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
         ];
     }
 

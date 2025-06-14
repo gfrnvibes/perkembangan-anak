@@ -25,10 +25,10 @@ class User extends Authenticatable
         return $this->hasMany(Anak::class);
     }
 
-    public function penilaianMingguan()
-    {
-        return $this->hasMany(PenilaianMingguan::class, 'guru_id');
-    }
+    // public function penilaianMingguan()
+    // {
+    //     return $this->hasMany(PenilaianMingguan::class, 'guru_id');
+    // }
 
     /**
      * The attributes that should be hidden for serialization.
