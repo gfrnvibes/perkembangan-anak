@@ -96,10 +96,11 @@
                                 @endif
                             </th>
                             <th>TTL</th>
+                            <th>Email Orang Tua</th>
                             <th>Nama Ayah</th>
                             <th>Nama Ibu</th>
-                            <th>Alamat</th>
-                            <th>Action</th>
+                            {{-- <th>Alamat</th> --}}
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -116,9 +117,10 @@
                                     @endif
                                 <td>{{ $item->tempat_lahir }},
                                     {{ \Carbon\Carbon::parse($item->tanggal_lahir)->format('d-m-Y') }}</td>
+                                <td>{{ $item->orangTua?->email }}</td>
                                 <td>{{ $item->ayah }}</td>
                                 <td>{{ $item->ibu }}</td>
-                                <td>{{ $item->alamat_lengkap }}</td>
+                                {{-- <td>{{ $item->alamat_lengkap }}</td> --}}
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button class="btn btn-primary btn-sm"

@@ -11,10 +11,10 @@ use Livewire\Attributes\Layout;
 
 #[Title('Tambah Anak Baru')]
 #[Layout('layouts.master')]
-
 class CreateAnak extends Component
 {
     // Form fields
+    public $email;
     public $user_id;
     public $nama_lengkap;
     public $nama_panggilan;
@@ -26,20 +26,21 @@ class CreateAnak extends Component
     public $ayah;
     public $ibu;
     public $alamat_lengkap;
-    
+    public $pas_foto;
+
     // For dropdown of parents
-    public $orangTuaList = [];
+    // public $orangTuaList = [];
 
     public function mount()
     {
         // Get list of users with 'user' role (parents)
-        $this->orangTuaList = User::role('user')->get();
+        // $this->orangTuaList = User::role('user')->get();
     }
 
     public function rules()
     {
         return [
-            'user_id' => 'required|exists:users,id',
+            'email' => 'required|email',
             'nama_lengkap' => 'required|string|max:255',
             'nama_panggilan' => 'required|string|max:255',
             'nomor_induk' => 'required|string|max:255|unique:anaks,nomor_induk',
@@ -50,13 +51,15 @@ class CreateAnak extends Component
             'ayah' => 'nullable|string|max:255',
             'ibu' => 'nullable|string|max:255',
             'alamat_lengkap' => 'required|string',
+            'pas_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 
     public function messages()
     {
         return [
-            'user_id.required' => 'Orang tua harus dipilih',
+            'email.required' => 'Email orang tua harus diisi',
+            'email.exists' => 'Email orang tua tidak ditemukan',
             'nama_lengkap.required' => 'Nama lengkap harus diisi',
             'nama_panggilan.required' => 'Nama panggilan harus diisi',
             'nomor_induk.required' => 'Nomor induk harus diisi',
@@ -72,17 +75,32 @@ class CreateAnak extends Component
     public function save()
     {
         $validatedData = $this->validate();
-        
+
+        // Cari user berdasarkan email, jika tidak ada buat user baru
+        $user = User::where('email', $this->email)->first();
+        if (!$user) {
+            $user = User::create([
+                'name' => $this->nama_lengkap,
+                'email' => $this->email,
+                'password' => bcrypt('password'), // Password default, sebaiknya ganti atau kirim email reset
+            ]);
+            // Jika pakai spatie/laravel-permission, tambahkan role user:
+            $user->assignRole('user');
+        }
+        $validatedData['user_id'] = $user->id;
+        unset($validatedData['email']);
+
+        // Simpan foto jika ada
+        if ($this->pas_foto) {
+            $validatedData['pas_foto'] = $this->pas_foto->store('pas_foto_anak', 'public');
+        }
+
         try {
             Anak::create($validatedData);
-            
+
             // Reset form fields
-            $this->reset([
-                'nama_lengkap', 'nama_panggilan', 'nomor_induk', 'nisn', 
-                'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 
-                'ayah', 'ibu', 'alamat_lengkap'
-            ]);
-            
+            $this->reset(['email', 'nama_panggilan', 'nomor_induk', 'nisn', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'ayah', 'ibu', 'alamat_lengkap']);
+
             session()->flash('message', 'Data anak berhasil ditambahkan!');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
