@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,       // Run this last to create users and assign roles
             AspekSeeder::class,
             IndikatorSeeder::class,
-            AnakSeeder::class,
-            NilaiSeeder::class,
+            // AnakSeeder::class,
+            // NilaiSeeder::class,
         ]);
     }
 }

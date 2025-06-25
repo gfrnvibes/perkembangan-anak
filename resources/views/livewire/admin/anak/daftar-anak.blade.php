@@ -123,14 +123,13 @@
                                 {{-- <td>{{ $item->alamat_lengkap }}</td> --}}
                                 <td class="text-center">
                                     <div class="btn-group">
-                                        <button class="btn btn-primary btn-sm"
-                                            wire:click="editAnak({{ $item->id }})"><i
-                                                class="bi bi-pencil-square"></i></button>
+                                        <a href="{{ route('edit', $item->nama_lengkap) }}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-pencil-square"></i></a>
                                         <button class="btn btn-danger btn-sm" wire:click="deleteAnak({{ $item->id }})"
                                             wire:confirm='Apa kamu yakin ingin menghapus ini?'><i
                                                 class="bi bi-trash"></i></button>
-                                        <button class="btn btn-info btn-sm" wire:click="showAnak({{ $item->id }})"><i
-                                                class="bi bi-eye"></i></button>
+                                        <a class="btn btn-info btn-sm" href="{{ route('detail', $item->nama_lengkap) }}"><i
+                                                class="bi bi-eye"></i></a>
                                     </div>
                                 </td>
                             </tr>

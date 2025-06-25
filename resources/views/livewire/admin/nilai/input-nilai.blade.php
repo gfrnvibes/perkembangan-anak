@@ -1,9 +1,37 @@
 <div>
     <div class="card">
-        <div class="card-header fw-bold">
+        <div class="card-header fw-bold d-flex justify-content-between align-items-center">
             <h3 class="card-title">
                 Input Nilai Perkembangan Anak (Mingguan)
             </h3>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <label for="importFile" class="form-label">Pilih File Excel</label>
+                            <input type="file" class="form-control" wire:model="importFile" accept=".xlsx,.xls,.csv">
+                            @error('importFile')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-success" wire:click="importFromExcel"
+                                    wire:loading.attr="disabled" wire:target="importFromExcel">
+                                    <i class="mdi mdi-file-excel me-1"></i>
+                                    <span wire:loading.remove wire:target="importFromExcel">Import Excel</span>
+                                    <span wire:loading wire:target="importFromExcel">Importing...</span>
+                                </button>
+
+                                <button type="button" class="btn btn-info" wire:click="downloadTemplate"
+                                    wire:loading.attr="disabled" wire:target="downloadTemplate">
+                                    <i class="mdi mdi-download me-1"></i>
+                                    <span wire:loading.remove wire:target="downloadTemplate">Download Template</span>
+                                    <span wire:loading wire:target="downloadTemplate">Downloading...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
         </div>
         <div class="card-body p-4">
 

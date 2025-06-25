@@ -4,17 +4,23 @@ namespace App\Livewire\Admin\Nilai;
 
 use App\Models\Anak;
 use App\Models\Aspek;
-use App\Models\Indikator;
 use App\Models\Nilai;
-use App\Models\TemplateCatatan;
 use Livewire\Component;
+use App\Models\Indikator;
+use App\Imports\ImportNilai;
+use Maatwebsite\Excel\Facades\Excel;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Title;
+use App\Models\TemplateCatatan;
 use Livewire\Attributes\Layout;
 
 #[Title('Input Nilai Anak')]
 #[Layout('layouts.master')]
 class InputNilai extends Component
 {
+    use WithFileUploads;
+
+    public $importFile;
     public $selectedAnak;
     public $selectedMinggu = 1;
     public $selectedBulan;
@@ -260,6 +266,81 @@ class InputNilai extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage());
         }
+    }
+
+    public function importFromExcel()
+    {
+        $this->validate(
+            [
+                'importFile' => 'required|mimes:xlsx,xls,csv|max:2048',
+                'selectedMinggu' => 'required',
+                'selectedBulan' => 'required',
+                'selectedTahun' => 'required',
+            ],
+            [
+                'importFile.required' => 'File Excel harus dipilih',
+                'importFile.mimes' => 'File harus berformat Excel (.xlsx, .xls) atau CSV',
+                'importFile.max' => 'Ukuran file maksimal 2MB',
+            ],
+        );
+
+        try {
+            Excel::import(new ImportNilai($this->selectedMinggu, $this->selectedBulan, $this->selectedTahun, $this->selectedSemester), $this->importFile->getRealPath());
+
+            session()->flash('success', 'Data nilai berhasil diimport dari Excel!');
+            $this->reset('importFile');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        $indikators = Indikator::with('aspek')->get();
+        $anakList = Anak::all();
+
+        $headers = ['nomor_induk', 'nama_anak'];
+
+        // Tambahkan kolom untuk setiap indikator
+        foreach ($indikators as $indikator) {
+            $headers[] = 'indikator_' . $indikator->id;
+            $headers[] = 'catatan_indikator_' . $indikator->id;
+        }
+
+        $data = [];
+        foreach ($anakList as $anak) {
+            $row = [
+                'nomor_induk' => $anak->nomor_induk,
+                'nama_anak' => $anak->nama_lengkap,
+            ];
+
+            // Tambahkan kolom kosong untuk setiap indikator
+            foreach ($indikators as $indikator) {
+                $row['indikator_' . $indikator->id] = '';
+                $row['catatan_indikator_' . $indikator->id] = '';
+            }
+
+            $data[] = $row;
+        }
+
+        return Excel::download(
+            new class ($headers, $data) implements \Maatwebsite\Excel\Concerns\FromArray {
+                protected $headers;
+                protected $data;
+
+                public function __construct($headers, $data)
+                {
+                    $this->headers = $headers;
+                    $this->data = $data;
+                }
+
+                public function array(): array
+                {
+                    return array_merge([$this->headers], $this->data);
+                }
+            },
+            'template_import_nilai.xlsx',
+        );
     }
 
     public function render()

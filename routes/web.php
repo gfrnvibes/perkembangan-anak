@@ -22,14 +22,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('guest')->group(function(){
+Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)->name('login');
 });
 
-
 Route::get('/', Home::class)->name('/');
 
-Route::middleware('auth')->group(function(){
+Route::middleware('auth')->group(function () {
     Route::get('jejak-ananda', Perkembangan::class)->name('perkembangan-ananda');
     Route::get('profil-ananda', ProfilAnanda::class)->name('profil-ananda');
 });
@@ -37,20 +36,20 @@ Route::middleware('auth')->group(function(){
 Route::get('logout', [LogoutController::class, 'logout'])->name('logout');
 
 // ADMIN
-Route::middleware('admin')->group(function() {
+Route::middleware('admin')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
 
     // CRUD ANAK
-    Route::get('daftar-anak', \App\Livewire\Admin\Anak\DaftarAnak::class)->name('daftar-anak');
-    Route::get('create-anak', \App\Livewire\Admin\Anak\CreateAnak::class)->name('create-anak');
-    Route::get('update-anak', \App\Livewire\Admin\Anak\UpdateAnak::class)->name('update-anak');
-    Route::get('detail-anak', \App\Livewire\Admin\Anak\DetailAnak::class)->name('detail-anak');
+Route::prefix('anak')->group( function () {
+        Route::get('daftar-anak', \App\Livewire\Admin\Anak\DaftarAnak::class)->name('daftar-anak');
+        Route::get('create-anak', \App\Livewire\Admin\Anak\CreateAnak::class)->name('create-anak');
+        Route::get('edit/{nama_lengkap}', \App\Livewire\Admin\Anak\UpdateAnak::class)->name('edit');
+        Route::get('detail/{nama_lengkap}', \App\Livewire\Admin\Anak\DetailAnak::class)->name('detail');
+    });
 
     // CRUD NILAI
     Route::get('daftar-nilai', \App\Livewire\Admin\Nilai\DaftarNilai::class)->name('daftar-nilai');
     Route::get('detail-nilai', \App\Livewire\Admin\Nilai\DetailNilaiAnak::class)->name('detail-nilai');
     Route::get('input-nilai', \App\Livewire\Admin\Nilai\InputNilai::class)->name('input-nilai');
     Route::get('update-nilai', \App\Livewire\Admin\Nilai\UpdateNilaiAnak::class)->name('update-nilai');
-
-    
 });
