@@ -30,7 +30,7 @@
                 <div class="col-md-4">
                     <div class="input-group">
                         <input type="file" wire:model="importExcel" class="form-control" id="importExcel">
-                        <button class="btn btn-outline-secondary" type="button" wire:click="importExcelFile"
+                        <button class="btn btn-outline-primary" type="button" wire:click="importExcelFile"
                             wire:loading.attr="disabled">
                             <span wire:loading wire:target="importExcelFile" class="spinner-border spinner-border-sm"
                                 role="status" aria-hidden="true"></span>
@@ -90,13 +90,13 @@
                                 @endif
                             </th>
                             <th wire:click="sortBy('jenis_kelamin')" style="cursor: pointer;">
-                                Jenis Kelamin
+                                L/P
                                 @if ($sortField === 'jenis_kelamin')
                                     <i class="bi bi-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
                                 @endif
                             </th>
-                            <th>TTL</th>
-                            <th>Email Orang Tua</th>
+                            {{-- <th>TTL</th> --}}
+                            {{-- <th>Email Orang Tua</th> --}}
                             <th>Nama Ayah</th>
                             <th>Nama Ibu</th>
                             {{-- <th>Alamat</th> --}}
@@ -115,9 +115,8 @@
                                     @else
                                         P
                                     @endif
-                                <td>{{ $item->tempat_lahir }},
-                                    {{ \Carbon\Carbon::parse($item->tanggal_lahir)->format('d-m-Y') }}</td>
-                                <td>{{ $item->orangTua?->email }}</td>
+                                {{-- <td>{{ $item->tempat_lahir }}, {{ \Carbon\Carbon::parse($item->tanggal_lahir)->format('d-m-Y') }}</td> --}}
+                                {{-- <td>{{ $item->orangTua?->email }}</td> --}}
                                 <td>{{ $item->ayah }}</td>
                                 <td>{{ $item->ibu }}</td>
                                 {{-- <td>{{ $item->alamat_lengkap }}</td> --}}

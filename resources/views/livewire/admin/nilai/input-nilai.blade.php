@@ -1,13 +1,13 @@
 <div>
     <div class="card">
         <div class="card-header fw-bold d-flex justify-content-between align-items-center">
-            <h3 class="card-title">
+            <h3 class="card-title mb-0">
                 Input Nilai Perkembangan Anak (Mingguan)
             </h3>
 
                     <div class="row align-items-end">
                         <div class="col-md-6">
-                            <label for="importFile" class="form-label">Pilih File Excel</label>
+                            {{-- <label for="importFile" class="form-label">Import Nilai</label> --}}
                             <input type="file" class="form-control" wire:model="importFile" accept=".xlsx,.xls,.csv">
                             @error('importFile')
                                 <div class="text-danger small">{{ $message }}</div>
@@ -304,7 +304,7 @@
             </div> --}}
 
             {{-- Debug Info (hanya untuk development) --}}
-            @if (config('app.debug') && $selectedAnak)
+            {{-- @if (config('app.debug') && $selectedAnak)
                 <div class="mt-4">
                     <div class="card border-warning">
                         <div class="card-header bg-warning text-dark">
@@ -329,7 +329,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @endif --}}
         </div>
     </div>
 </div>

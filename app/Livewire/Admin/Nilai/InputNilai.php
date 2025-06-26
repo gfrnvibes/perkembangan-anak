@@ -156,17 +156,21 @@ class InputNilai extends Component
     public function updatedNilai($value, $key)
     {
         // Auto-generate catatan dari template saat nilai berubah
-        if (!empty($value) && empty($this->catatan[$key])) {
-            // Extract aspek_id dan indikator_id dari key
-            preg_match('/aspek_(\d+)_indikator_(\d+)/', $key, $matches);
-            if (count($matches) >= 3) {
-                $indikatorId = $matches[2];
-                $template = $this->getTemplateCatatan($indikatorId, $value);
-                if ($template) {
-                    $this->catatan[$key] = $template->isi_template;
-                }
+    // Auto-generate catatan dari template saat nilai berubah (selalu update)
+    if (!empty($value)) {
+        // Extract aspek_id dan indikator_id dari key
+        preg_match('/aspek_(\d+)_indikator_(\d+)/', $key, $matches);
+        if (count($matches) >= 3) {
+            $indikatorId = $matches[2];
+            $template = $this->getTemplateCatatan($indikatorId, $value);
+            if ($template) {
+                $this->catatan[$key] = $template->isi_template;
             }
         }
+    } else {
+        // Kosongkan catatan jika nilai dikosongkan
+        $this->catatan[$key] = '';
+    }
     }
 
     private function getTemplateCatatan($indikatorId, $nilaiNumerik)
@@ -299,25 +303,27 @@ class InputNilai extends Component
         $indikators = Indikator::with('aspek')->get();
         $anakList = Anak::all();
 
-        $headers = ['nomor_induk', 'nama_anak'];
+        $headers = [
+            // 'nomor_induk',
+            'nama_anak'];
 
         // Tambahkan kolom untuk setiap indikator
         foreach ($indikators as $indikator) {
             $headers[] = 'indikator_' . $indikator->id;
-            $headers[] = 'catatan_indikator_' . $indikator->id;
+            // $headers[] = 'catatan_indikator_' . $indikator->id;
         }
 
         $data = [];
         foreach ($anakList as $anak) {
             $row = [
-                'nomor_induk' => $anak->nomor_induk,
+                // 'nomor_induk' => "'" . $anak->nomor_induk,
                 'nama_anak' => $anak->nama_lengkap,
             ];
 
             // Tambahkan kolom kosong untuk setiap indikator
             foreach ($indikators as $indikator) {
                 $row['indikator_' . $indikator->id] = '';
-                $row['catatan_indikator_' . $indikator->id] = '';
+                // $row['catatan_indikator_' . $indikator->id] = '';
             }
 
             $data[] = $row;

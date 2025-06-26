@@ -42,25 +42,33 @@
                     </a>
                 </li>
 
+                
+                <li class="menu-title">KELOLA NILAI</li>
                 <li>
                     <a href="{{ route('input-nilai') }}" class="waves-effect">
                         <i class="uil-edit"></i>
                         <span>Input Nilai</span>
                     </a>
                 </li>
-
-                <li class="menu-title">@lang('translation.Apps')</li>
                 <li>
                     <a href="{{ route('daftar-nilai') }}" class=" waves-effect">
                         <i class="uil-list-ul"></i>
                         <span>Daftar Nilai</span>
                     </a>
                 </li>
-
+                
+                <li class="menu-title">KELOLA ANAK</li>
                 <li>
                     <a href="{{ route('daftar-anak') }}" class="waves-effect">
                         <i class="uil-users-alt"></i>
                         <span>Daftar Anak</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('orang-tua') }}" class="waves-effect">
+                        <i class="uil-whatsapp"></i>
+                        <span>Kontak Orang Tua</span>
                     </a>
                 </li>
 

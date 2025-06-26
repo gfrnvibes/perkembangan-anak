@@ -22,7 +22,10 @@ return new class extends Migration {
             $table->string('tanggal_lahir');
             $table->string('ayah')->nullable();
             $table->string('ibu')->nullable();
+            $table->string('wali')->nullable();
             $table->text('alamat_lengkap');
+            $table->string('pas_foto')->nullable();
+            $table->string('phone_number')->nullable();
             $table->timestamps();
         });
     }

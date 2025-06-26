@@ -546,7 +546,7 @@
     @endif
 
     {{-- Debug Info (Development Only) --}}
-    @if (config('app.debug') && $selectedAnak)
+    {{-- @if (config('app.debug') && $selectedAnak)
         <div class="card mt-4 border-warning">
             <div class="card-header bg-warning text-dark">
                 <h6 class="mb-0">
@@ -591,5 +591,5 @@
                 </div>
             </div>
         </div>
-    @endif
+    @endif --}}
 </div>

@@ -155,7 +155,7 @@
 
                 // Create new chart
                 perkembanganChart = new Chart(ctx, {
-                    type: 'bar',
+                    type: 'line',
                     data: chartData,
                     options: {
                         responsive: true,

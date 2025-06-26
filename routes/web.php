@@ -40,16 +40,19 @@ Route::middleware('admin')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
 
     // CRUD ANAK
-Route::prefix('anak')->group( function () {
+    Route::prefix('anak')->group(function () {
         Route::get('daftar-anak', \App\Livewire\Admin\Anak\DaftarAnak::class)->name('daftar-anak');
         Route::get('create-anak', \App\Livewire\Admin\Anak\CreateAnak::class)->name('create-anak');
         Route::get('edit/{nama_lengkap}', \App\Livewire\Admin\Anak\UpdateAnak::class)->name('edit');
         Route::get('detail/{nama_lengkap}', \App\Livewire\Admin\Anak\DetailAnak::class)->name('detail');
+        Route::get('orang-tua', \App\Livewire\Admin\OrangTua::class)->name('orang-tua');
     });
 
     // CRUD NILAI
-    Route::get('daftar-nilai', \App\Livewire\Admin\Nilai\DaftarNilai::class)->name('daftar-nilai');
-    Route::get('detail-nilai', \App\Livewire\Admin\Nilai\DetailNilaiAnak::class)->name('detail-nilai');
-    Route::get('input-nilai', \App\Livewire\Admin\Nilai\InputNilai::class)->name('input-nilai');
-    Route::get('update-nilai', \App\Livewire\Admin\Nilai\UpdateNilaiAnak::class)->name('update-nilai');
+    Route::prefix('nilai')->group(function () {
+        Route::get('daftar-nilai', \App\Livewire\Admin\Nilai\DaftarNilai::class)->name('daftar-nilai');
+        Route::get('detail-nilai', \App\Livewire\Admin\Nilai\DetailNilaiAnak::class)->name('detail-nilai');
+        Route::get('input-nilai', \App\Livewire\Admin\Nilai\InputNilai::class)->name('input-nilai');
+        Route::get('update-nilai', \App\Livewire\Admin\Nilai\UpdateNilaiAnak::class)->name('update-nilai');
+    });
 });
