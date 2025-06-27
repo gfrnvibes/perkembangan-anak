@@ -15,7 +15,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 #[Title('Daftar Anak')]
 #[Layout('layouts.master')]
-
 class DaftarAnak extends Component
 {
     use WithPagination;
@@ -30,7 +29,7 @@ class DaftarAnak extends Component
     public $sortDirection = 'asc';
     public $filterJenisKelamin = '';
     public $perPage = 10;
-    
+
     // Form properties
     public $anakId;
     public $nama_lengkap;
@@ -45,10 +44,10 @@ class DaftarAnak extends Component
     public $nama_panggilan;
     public $wali;
     public $user_id;
-    
+
     // Tambahkan listeners untuk event
     protected $listeners = ['refreshData' => '$refresh'];
-    
+
     // Tambahkan queryString untuk menjaga state saat pagination
     protected function queryString()
     {
@@ -60,23 +59,23 @@ class DaftarAnak extends Component
             'perPage' => ['except' => 10],
         ];
     }
-    
+
     // Tambahkan method untuk reset pagination saat search atau filter berubah
     public function updatingSearch()
     {
         $this->resetPage();
     }
-    
+
     public function updatingFilterJenisKelamin()
     {
         $this->resetPage();
     }
-    
+
     public function updatingPerPage()
     {
         $this->resetPage();
     }
-    
+
     protected $rules = [
         'nama_lengkap' => 'required|string|max:255',
         'nomor_induk' => 'required|string|max:18',
@@ -90,28 +89,28 @@ class DaftarAnak extends Component
         'nama_panggilan' => 'nullable|string|max:50',
         'user_id' => 'nullable|exists:users,id',
     ];
-    
+
     public function render()
     {
         $anak = Anak::query()
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
                     $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                      ->orWhere('nomor_induk', 'like', '%' . $this->search . '%')
-                      ->orWhere('nisn', 'like', '%' . $this->search . '%');
+                        ->orWhere('nomor_induk', 'like', '%' . $this->search . '%')
+                        ->orWhere('nisn', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->filterJenisKelamin, function($query) {
+            ->when($this->filterJenisKelamin, function ($query) {
                 $query->where('jenis_kelamin', $this->filterJenisKelamin);
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
-            
+
         return view('livewire.admin.anak.daftar-anak', [
-            'anak' => $anak
+            'anak' => $anak,
         ]);
     }
-    
+
     public function sortBy($field)
     {
         if ($this->sortField === $field) {
@@ -119,16 +118,16 @@ class DaftarAnak extends Component
         } else {
             $this->sortDirection = 'asc';
         }
-        
+
         $this->sortField = $field;
     }
-    
+
     public function showAnak($id)
     {
         $this->resetForm();
         $this->anakId = $id;
         $anak = Anak::findOrFail($id);
-        
+
         $this->nama_lengkap = $anak->nama_lengkap;
         $this->nomor_induk = $anak->nomor_induk;
         $this->nisn = $anak->nisn;
@@ -140,18 +139,18 @@ class DaftarAnak extends Component
         $this->alamat_lengkap = $anak->alamat_lengkap;
         $this->nama_panggilan = $anak->nama_panggilan;
         $this->wali = $anak->wali;
-        
+
         $this->dispatch('showViewModal');
     }
-    
+
     public function deleteAnak($id)
     {
         $anak = Anak::findOrFail($id);
         $anak->delete();
-        
+
         session()->flash('message', 'Data anak berhasil dihapus.');
     }
-    
+
     public function resetForm()
     {
         $this->anakId = null;
@@ -166,48 +165,82 @@ class DaftarAnak extends Component
         $this->alamat_lengkap = '';
         $this->nama_panggilan = '';
         $this->user_id = null;
-        
+
         $this->resetValidation();
     }
-    
+
     public function importExcelFile()
     {
         try {
             $this->validate([
                 'importExcel' => 'required|file|mimes:xlsx,xls',
             ]);
-            
-            // Simpan file sementara dan dapatkan path lengkap
+
             $path = $this->importExcel->store('temp');
             $fullPath = storage_path('app/' . $path);
-            
-            // Periksa apakah file ada
+
             if (!file_exists($fullPath)) {
                 session()->flash('error', 'File tidak ditemukan setelah upload: ' . $fullPath);
                 return;
             }
-            
-            // Log informasi file
+
             Log::info('Importing Excel file: ' . $fullPath);
-            
-            // Import dengan try-catch untuk menangkap error spesifik
+
+            // Baca file excel manual, lalu proses satu per satu
+            $rows = Excel::toArray(new AnakImport(), $fullPath)[0];
+
+            // Lewati baris header, mulai dari baris data
+            foreach ($rows as $index => $row) {
+                // if ($index === 0) {
+                //     continue;
+                // }
+
+                $email = $row['email'] ?? null;
+                $nama_lengkap = $row['nama_lengkap'] ?? null;
+
+                if (!$email) {
+                    session()->flash('error', 'Email tidak ditemukan pada baris ke-' . ($index + 2));
+                    return;
+                }
+
+                // Buat user jika belum ada
+                $user = \App\Models\User::firstOrCreate(['email' => $email], ['name' => $nama_lengkap, 'password' => bcrypt('password')]);
+
+                // Buat anak langsung, pakai user_id yang valid
+                Anak::create([
+                    'user_id' => $user->id,
+                    'nama_lengkap' => $row['nama_lengkap'],
+                    'nama_panggilan' => $row['nama_panggilan'],
+                    'nomor_induk' => $row['nomor_induk'],
+                    'nisn' => $row['nisn'],
+                    'jenis_kelamin' => $row['jenis_kelamin'],
+                    'tempat_lahir' => $row['tempat_lahir'],
+                    'tanggal_lahir' => $row['tanggal_lahir'],
+                    'ayah' => $row['ayah'],
+                    'ibu' => $row['ibu'],
+                    'wali' => $row['wali'],
+                    'phone_number' => $row['phone_number'],
+                    'alamat_lengkap' => $row['alamat_lengkap'],
+                ]);
+            }
+
+            // Setelah user dipastikan ada, lakukan import seperti biasa
             try {
-                Excel::import(new AnakImport, $fullPath);
+                Excel::import(new AnakImport(), $fullPath);
             } catch (\Exception $e) {
                 Log::error('Excel import error: ' . $e->getMessage());
                 session()->flash('error', 'Gagal mengimpor file: ' . $e->getMessage());
                 return;
             }
-            
+
             $this->importExcel = null;
-            session()->flash('message', 'Data anak berhasil diimpor.');
-            
+            session()->flash('message', 'Data anak dan user berhasil diimpor.');
         } catch (\Exception $e) {
             Log::error('Import process error: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-    
+
     public function exportExcel()
     {
         return Excel::download(new ExportAnak($this->search, $this->filterJenisKelamin, $this->sortField, $this->sortDirection), 'daftar-anak.xlsx');

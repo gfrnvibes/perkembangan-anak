@@ -71,6 +71,7 @@
                 <table class="table table-bordered table-striped table-sm">
                     <thead>
                         <tr class="text-center align-middle">
+                            <th>No</th>
                             <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">
                                 Nama Lengkap
                                 @if ($sortField === 'nama_lengkap')
@@ -106,6 +107,7 @@
                     <tbody>
                         @forelse($anak as $item)
                             <tr class="align-middle">
+                                <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->nama_lengkap }}</td>
                                 <td>{{ $item->nomor_induk }}</td>
                                 <td>{{ $item->nisn }}</td>
