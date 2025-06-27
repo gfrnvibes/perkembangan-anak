@@ -1,128 +1,290 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+            {{-- Tabel Nilai Section --}}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        Grafik Perkembangan Anak
+                        <i class="fas fa-table me-2"></i>
+                        Tabel Nilai Perkembangan
                     </h5>
                 </div>
-
                 <div class="card-body">
-                    {{-- Filter Section --}}
+                    {{-- Filter Section untuk Tabel --}}
                     <div class="row mb-4">
-                        {{-- Pilih Anak --}}
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Pilih Anak</label>
-                            <select wire:model.live="selectedAnak" class="form-select">
-                                <option value="">-- Pilih Anak --</option>
-                                @foreach ($anakList as $anak)
-                                    <option value="{{ $anak['id'] }}">{{ $anak['nama_lengkap'] }}</option>
-                                @endforeach
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Periode Laporan</label>
+                            <select wire:model.live="selectedPeriode" class="form-select">
+                                <option value="mingguan">Mingguan</option>
+                                <option value="bulanan">Bulanan</option>
+                                <option value="semesteran">Semesteran</option>
                             </select>
                         </div>
 
-                        {{-- Pilih Tahun --}}
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-bold">Tahun</label>
-                            <select wire:model.live="selectedTahun" class="form-select">
-                                @for ($year = date('Y'); $year >= date('Y') - 5; $year--)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endfor
-                            </select>
-                        </div>
+                        {{-- Filter Mingguan --}}
+                        @if ($selectedPeriode == 'mingguan')
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Pilih Minggu</label>
+                                <select wire:model.live="selectedWeek" class="form-select">
+                                    <option value="">-- Pilih Minggu --</option>
+                                    @foreach ($weekOptions as $weekNumber => $weekLabel)
+                                        <option value="{{ $weekNumber }}">{{ $weekLabel }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Bulan</label>
+                                <select wire:model.live="selectedMonth" class="form-select">
+                                    @foreach ($monthOptions as $monthNumber => $monthName)
+                                        <option value="{{ $monthNumber }}">{{ $monthName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Tahun</label>
+                                <select wire:model.live="selectedTahun" class="form-select">
+                                    @for ($year = date('Y') - 2; $year <= date('Y') + 1; $year++)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        @endif
 
-                        {{-- Pilih Semester --}}
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-bold">Semester</label>
-                            <select wire:model.live="selectedSemester" class="form-select">
-                                <option value="ganjil">Ganjil</option>
-                                <option value="genap">Genap</option>
-                            </select>
-                        </div>
+                        {{-- Filter Bulanan --}}
+                        @if ($selectedPeriode == 'bulanan')
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Bulan</label>
+                                <select wire:model.live="selectedMonth" class="form-select">
+                                    @foreach ($monthOptions as $monthNumber => $monthName)
+                                        <option value="{{ $monthNumber }}">{{ $monthName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Tahun</label>
+                                <select wire:model.live="selectedTahun" class="form-select">
+                                    @for ($year = date('Y') - 2; $year <= date('Y') + 1; $year++)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        @endif
 
-                        {{-- Pilih Bulan --}}
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-bold">Bulan</label>
-                            <select wire:model.live="selectedBulan" class="form-select">
-                                <option value="">Semua Bulan</option>
-                                @if ($selectedSemester == 'ganjil')
-                                    <option value="7">Juli</option>
-                                    <option value="8">Agustus</option>
-                                    <option value="9">September</option>
-                                    <option value="10">Oktober</option>
-                                    <option value="11">November</option>
-                                    <option value="12">Desember</option>
-                                @else
-                                    <option value="1">Januari</option>
-                                    <option value="2">Februari</option>
-                                    <option value="3">Maret</option>
-                                    <option value="4">April</option>
-                                    <option value="5">Mei</option>
-                                    <option value="6">Juni</option>
-                                @endif
-                            </select>
-                        </div>
-
-                        {{-- Pilih Aspek --}}
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Aspek Perkembangan</label>
-                            <select wire:model.live="selectedAspek" class="form-select">
-                                <option value="">Semua Aspek</option>
-                                @foreach ($aspekList as $aspek)
-                                    <option value="{{ $aspek['id'] }}">{{ $aspek['nama_aspek'] }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        {{-- Filter Semesteran --}}
+                        @if ($selectedPeriode == 'semesteran')
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Semester</label>
+                                <select wire:model.live="selectedSemester" class="form-select">
+                                    <option value="ganjil">Ganjil (Jul-Des)</option>
+                                    <option value="genap">Genap (Jan-Jun)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Tahun</label>
+                                <select wire:model.live="selectedTahun" class="form-select">
+                                    @for ($year = date('Y') - 2; $year <= date('Y') + 1; $year++)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        @endif
                     </div>
 
-                    {{-- Chart Container --}}
-                    <div class="row">
-                        <div class="col-12">
-                            @if ($selectedAnak && count($chartData['labels']) > 0)
-                                <div class="chart-container" style="position: relative; height: 400px;">
-                                    <canvas id="perkembanganChart" wire:ignore></canvas>
-                                </div>
-                            @else
-                                <div class="text-center py-5">
-                                    <div class="text-muted">
-                                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
-                                        <h5>Tidak Ada Data</h5>
-                                        <p>
-                                            @if (!$selectedAnak)
-                                                Silakan pilih anak terlebih dahulu
+                    @if ($selectedAnak && !empty($nilaiData))
+                        <div class="table-responsive">
+                            {{-- Tabel Mingguan --}}
+                            @if ($selectedPeriode == 'mingguan')
+                                <table class="table table-bordered table-striped">
+                                    <thead class="table-success text-center align-middle">
+                                        <tr>
+                                            <th colspan="2" rowspan="2">KD & INDIKATOR</th>
+                                            <th rowspan="2">CAPAIAN<br>MINGGU INI</th>
+                                            <th rowspan="2">CATATAN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($nilaiData as $aspekNama => $nilaiAspek)
+                                            <tr>
+                                                <td colspan="4" class="align-middle fw-bold bg-light">
+                                                    {{ $aspekNama }}
+                                                </td>
+                                            </tr>
+                                            @foreach ($nilaiAspek as $nilai)
+                                                <tr>
+                                                    <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                                                    <td>{{ $nilai->indikator->nama_indikator }}</td>
+                                                    <td class="text-center">
+                                                        @if ($nilai->nilai_numerik)
+                                                            <span
+                                                                class="badge bg-success">{{ $nilaiMapping[$nilai->nilai_numerik] }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <small>{{ $nilai->catatan ?? '-' }}</small>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
+
+                            {{-- Tabel Bulanan --}}
+                            @if ($selectedPeriode == 'bulanan')
+                                <table class="table table-bordered table-striped">
+                                    <thead class="table-success text-center align-middle">
+                                        <tr>
+                                            <th rowspan="2" colspan="2">KD & INDIKATOR</th>
+                                            <th colspan="4">MINGGU KE</th>
+                                            <th rowspan="2">CAPAIAN<br>AKHIR BLN</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Minggu 1</th>
+                                            <th>Minggu 2</th>
+                                            <th>Minggu 3</th>
+                                            <th>Minggu 4</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($nilaiData as $aspekNama => $nilaiAspek)
+                                            <tr>
+                                                <td colspan="7" class="align-middle fw-bold bg-light">
+                                                    {{ $aspekNama }}
+                                                </td>
+                                            </tr>
+                                            @foreach ($nilaiAspek as $nilai)
+                                                <tr>
+                                                    <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                                                    <td>{{ $nilai->indikator->nama_indikator }}</td>
+
+                                                    @for ($week = 1; $week <= 4; $week++)
+                                                        <td class="text-center">
+                                                            @if (isset($nilai->minggu_data["minggu_$week"]))
+                                                                <span
+                                                                    class="badge bg-primary">{{ $nilaiMapping[$nilai->minggu_data["minggu_$week"]] }}</span>
+                                                            @else
+                                                                <span class="text-muted">-</span>
+                                                            @endif
+                                                        </td>
+                                                    @endfor
+
+                                                    <td class="text-center">
+                                                        @if ($nilai->capaian_akhir_bulan)
+                                                            <span
+                                                                class="badge bg-success">{{ $nilaiMapping[$nilai->capaian_akhir_bulan] }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
+
+                            {{-- Tabel Semesteran --}}
+                            @if ($selectedPeriode == 'semesteran')
+                                <table class="table table-bordered table-striped">
+                                    <thead class="table-success text-white align-middle text-center">
+                                        <tr>
+                                            <th rowspan="2" colspan="2">KD & INDIKATOR</th>
+                                            <th colspan="6">BULAN</th>
+                                            <th rowspan="2">CAPAIAN<br>AKHIR SMT</th>
+                                        </tr>
+                                        <tr>
+                                            @if ($selectedSemester == 'ganjil')
+                                                <th>Jul</th>
+                                                <th>Aug</th>
+                                                <th>Sep</th>
+                                                <th>Oct</th>
+                                                <th>Nov</th>
+                                                <th>Dec</th>
                                             @else
-                                                Belum ada data perkembangan untuk periode yang dipilih
+                                                <th>Jan</th>
+                                                <th>Feb</th>
+                                                <th>Mar</th>
+                                                <th>Apr</th>
+                                                <th>May</th>
+                                                <th>Jun</th>
                                             @endif
-                                        </p>
-                                    </div>
-                                </div>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($nilaiData as $aspekNama => $nilaiAspek)
+                                            <tr>
+                                                <td colspan="9" class="align-middle fw-bold bg-light">
+                                                    {{ $aspekNama }}
+                                                </td>
+                                            </tr>
+                                            @foreach ($nilaiAspek as $nilai)
+                                                <tr>
+                                                    <td class="text-center">IND-{{ $nilai->indikator->id }}</td>
+                                                    <td>{{ $nilai->indikator->nama_indikator }}</td>
+
+                                                    @php
+                                                        $months =
+                                                            $selectedSemester == 'ganjil'
+                                                                ? ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                                                                : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                                                    @endphp
+
+                                                    @foreach ($months as $month)
+                                                        <td class="text-center">
+                                                            @if (isset($nilai->bulan_data[$month]))
+                                                                <span
+                                                                    class="badge bg-primary">{{ $nilaiMapping[$nilai->bulan_data[$month]] }}</span>
+                                                            @else
+                                                                <span class="text-muted">-</span>
+                                                            @endif
+                                                        </td>
+                                                    @endforeach
+
+                                                    <td class="text-center">
+                                                        @if ($nilai->capaian_akhir_semester)
+                                                            <span
+                                                                class="badge bg-success">{{ $nilaiMapping[$nilai->capaian_akhir_semester] }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             @endif
                         </div>
-                    </div>
-
+                    @elseif($selectedAnak && empty($nilaiData))
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Tidak ada data nilai untuk periode yang dipilih</p>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <i class="fas fa-child fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Pilih anak untuk melihat data nilai</p>
+                        </div>
+                    @endif
 
                     {{-- Keterangan Nilai --}}
-                    @if ($selectedAnak && count($chartData['labels']) > 0)
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="alert alert-info">
-                                    <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Keterangan Nilai:</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <small>
-                                                <strong>1 = BB:</strong> Belum Berkembang<br>
-                                                <strong>2 = MB:</strong> Mulai Berkembang
-                                            </small>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <small>
-                                                <strong>3 = BSH:</strong> Berkembang Sesuai Harapan<br>
-                                                <strong>4 = BSB:</strong> Berkembang Sangat Baik
-                                            </small>
-                                        </div>
-                                    </div>
+                    @if ($selectedAnak && !empty($nilaiData))
+                        <div class="alert alert-info mb-0 mt-4">
+                            <h6 class="alert-heading">Keterangan Penilaian:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="mb-0">
+                                        <li><strong>BB:</strong> Belum Berkembang</li>
+                                        <li><strong>MB:</strong> Mulai Berkembang</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="mb-0">
+                                        <li><strong>BSH:</strong> Berkembang Sesuai Harapan</li>
+                                        <li><strong>BSB:</strong> Berkembang Sangat Baik</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -131,146 +293,4 @@
             </div>
         </div>
     </div>
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            let perkembanganChart = null;
-
-            function updateChart() {
-                const ctx = document.getElementById('perkembanganChart');
-                if (!ctx) return;
-
-                // Get chart data from Livewire component
-                const chartData = @json($chartData);
-
-                // Check if data exists
-                if (!chartData || !chartData.labels || chartData.labels.length === 0) {
-                    return;
-                }
-
-                // Destroy existing chart
-                if (perkembanganChart) {
-                    perkembanganChart.destroy();
-                }
-
-                // Create new chart
-                perkembanganChart = new Chart(ctx, {
-                    type: 'line',
-                    data: chartData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Grafik Perkembangan Anak',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
-                                }
-                            },
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 4,
-                                ticks: {
-                                    stepSize: 1,
-                                    callback: function(value) {
-                                        const labels = {
-                                            1: '1 (BB)',
-                                            2: '2 (MB)',
-                                            3: '3 (BSH)',
-                                            4: '4 (BSB)'
-                                        };
-                                        return labels[value] || value;
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Nilai Perkembangan'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Aspek/Indikator'
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 0
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Initialize chart when page loads
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(updateChart, 500);
-            });
-
-            // Listen for chart updates
-            window.addEventListener('chart-update', function() {
-                setTimeout(updateChart, 100);
-            });
-
-            // Livewire hooks
-            document.addEventListener('livewire:init', () => {
-                Livewire.on('chart-update', () => {
-                    setTimeout(updateChart, 100);
-                });
-            });
-        </script>
-    @endpush
-
-
-    @push('styles')
-        <style>
-            .chart-container {
-                background: #fff;
-                border-radius: 8px;
-                padding: 20px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            .form-label {
-                color: #495057;
-                font-size: 0.875rem;
-            }
-
-            .form-select {
-                border: 1px solid #ced4da;
-                border-radius: 6px;
-                font-size: 0.875rem;
-            }
-
-            .form-select:focus {
-                border-color: #80bdff;
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-            }
-
-            .card {
-                /* border: none; */
-                border-radius: 10px;
-            }
-
-            .card-header {
-                border-radius: 10px 10px 0 0 !important;
-                border-bottom: none;
-            }
-
-            .alert-info {
-                background-color: #e7f3ff;
-                border-color: #b8daff;
-                color: #004085;
-                border-radius: 8px;
-            }
-        </style>
-    @endpush
 </div>

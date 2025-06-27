@@ -27,6 +27,8 @@ class CreateAnak extends Component
     public $ibu;
     public $alamat_lengkap;
     public $pas_foto;
+    public $wali;
+    public $phone_number;
 
     // For dropdown of parents
     // public $orangTuaList = [];
@@ -43,14 +45,16 @@ class CreateAnak extends Component
             'email' => 'required|email',
             'nama_lengkap' => 'required|string|max:255',
             'nama_panggilan' => 'required|string|max:255',
-            'nomor_induk' => 'required|string|max:255|unique:anaks,nomor_induk',
-            'nisn' => 'nullable|string|max:255|unique:anaks,nisn',
+            'nomor_induk' => 'required|string|digits:17|unique:anaks,nomor_induk',
+            'nisn' => 'nullable|string|digits:10|unique:anaks,nisn',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'ayah' => 'nullable|string|max:255',
             'ibu' => 'nullable|string|max:255',
+            // 'wali' => 'nullable|string|max:255', 
             'alamat_lengkap' => 'required|string',
+            'phone_number' => 'nullable|string|max:15', 
             'pas_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
@@ -69,6 +73,11 @@ class CreateAnak extends Component
             'tempat_lahir.required' => 'Tempat lahir harus diisi',
             'tanggal_lahir.required' => 'Tanggal lahir harus diisi',
             'alamat_lengkap.required' => 'Alamat lengkap harus diisi',
+            'pas_foto.image' => 'File harus berupa gambar',
+            'pas_foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
+            'pas_foto.max' => 'Ukuran gambar maksimal 2MB',
+            // 'wali.max' => 'Nama wali maksimal 255 karakter',
+            'phone_number.max' => 'Nomor telepon maksimal 15 karakter',
         ];
     }
 

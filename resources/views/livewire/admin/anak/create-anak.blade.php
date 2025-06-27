@@ -48,6 +48,15 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label for="phone_number" class="form-label">No. WhatsApp</label>
+                                        <input type="number" wire:model="phone_number" id="phone_number"
+                                            class="form-control @error('phone_number') is-invalid @enderror">
+                                        @error('phone_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
                                         <input type="text" wire:model="nama_lengkap" id="nama_lengkap"
                                             class="form-control @error('nama_lengkap') is-invalid @enderror">

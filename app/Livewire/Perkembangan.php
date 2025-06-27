@@ -20,12 +20,30 @@ class Perkembangan extends Component
     public $selectedAspek = null;
     public $selectedAnak = null;
 
+    public $selectedPeriode = 'mingguan';
+    public $selectedWeek;
+    public $selectedMonth;
+    public $nilaiData = [];
+
     public $anakList = [];
     public $aspekList = [];
+
+    // Mapping nilai
+    public $nilaiMapping = [
+        1 => 'BB',
+        2 => 'MB',
+        3 => 'BSH',
+        4 => 'BSB',
+    ];
 
     public function mount()
     {
         $this->selectedTahun = date('Y');
+        $this->selectedMonth = date('n');
+        $this->selectedWeek = $this->getCurrentWeek();
+        $this->selectedSemester = $this->getCurrentSemester();
+
+        $this->loadNilaiData();
 
         // Ambil anak dari user yang sedang login
         $this->anakList = Anak::where('user_id', Auth::id())->get()->toArray();
@@ -38,6 +56,27 @@ class Perkembangan extends Component
         $this->aspekList = Aspek::orderBy('id')->get()->toArray();
     }
 
+    public function getCurrentWeek()
+    {
+        return 1; // Default minggu 1
+    }
+
+    public function getCurrentSemester()
+    {
+        $month = date('n');
+        return $month >= 7 && $month <= 12 ? 'ganjil' : 'genap';
+    }
+
+    public function updatedSelectedPeriode()
+    {
+        $this->loadNilaiData();
+    }
+
+    public function updatedSelectedWeek()
+    {
+        $this->loadNilaiData();
+    }
+
     public function updatedSelectedAspek()
     {
         $this->dispatch('chart-update');
@@ -48,19 +87,24 @@ class Perkembangan extends Component
         $this->dispatch('chart-update');
     }
 
-    public function updatedSelectedBulan()
+    // Update method updatedSelectedMonth yang sudah ada
+    public function updatedSelectedMonth()
     {
-        $this->dispatch('chart-update');
+        $this->loadNilaiData();
     }
 
+    // Update method updatedSelectedTahun yang sudah ada
     public function updatedSelectedTahun()
     {
         $this->dispatch('chart-update');
+        $this->loadNilaiData();
     }
 
+    // Update method updatedSelectedAnak yang sudah ada
     public function updatedSelectedAnak()
     {
         $this->dispatch('chart-update');
+        $this->loadNilaiData();
     }
 
     public function getChartData()
@@ -156,85 +200,69 @@ class Perkembangan extends Component
         ];
     }
 
-private function getAllAspekChart($nilai)
-{
-    $aspeks = Aspek::orderBy('id')->get();
-    $labels = [];
-    $data = [];
+    private function getAllAspekChart($nilai)
+    {
+        $aspeks = Aspek::orderBy('id')->get();
+        $labels = [];
+        $data = [];
 
-    $bulanRange = $this->selectedSemester == 'ganjil'
-        ? [7, 8, 9, 10, 11, 12]
-        : [1, 2, 3, 4, 5, 6];
+        $bulanRange = $this->selectedSemester == 'ganjil' ? [7, 8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6];
 
-    if ($this->selectedBulan) {
-        $bulanRange = [(int)$this->selectedBulan];
-    }
-
-    foreach ($aspeks as $aspek) {
-        $labels[] = $aspek->nama_aspek;
-        $indikators = Indikator::where('aspek_id', $aspek->id)->get();
-
-        $nilaiTertinggiAspek = 0;
-
-        foreach ($indikators as $indikator) {
-            $nilaiTertinggiIndikator = 0;
-
-            foreach ($bulanRange as $bulan) {
-                $nilaiData = is_array($nilai->nilai_data) ? $nilai->nilai_data : [];
-                $semesterKey = "semester_{$this->selectedSemester}";
-                $aspekKey = "aspek_{$aspek->id}";
-                $indikatorKey = "indikator_{$indikator->id}";
-                $bulanKey = "bulan_{$bulan}";
-
-                $bulanData = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey] ?? [];
-
-                if (is_array($bulanData) && !empty($bulanData)) {
-                    $mingguNilai = [];
-                    foreach ($bulanData as $mingguData) {
-                        $numericValue = $this->convertNilaiToNumeric($mingguData);
-                        if ($numericValue > 0) {
-                            $mingguNilai[] = $numericValue;
-                        }
-                    }
-                    if (!empty($mingguNilai)) {
-                        $nilaiTertinggiIndikator = max($nilaiTertinggiIndikator, max($mingguNilai));
-                    }
-                }
-            }
-
-            $nilaiTertinggiAspek = max($nilaiTertinggiAspek, $nilaiTertinggiIndikator);
+        if ($this->selectedBulan) {
+            $bulanRange = [(int) $this->selectedBulan];
         }
 
-        $data[] = $nilaiTertinggiAspek;
-    }
+        foreach ($aspeks as $aspek) {
+            $labels[] = $aspek->nama_aspek;
+            $indikators = Indikator::where('aspek_id', $aspek->id)->get();
 
-    return [
-        'labels' => $labels,
-        'datasets' => [
-            [
-                'label' => 'Nilai Tertinggi Perkembangan',
-                'data' => $data,
-                'backgroundColor' => [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 205, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)'
+            $nilaiTertinggiAspek = 0;
+
+            foreach ($indikators as $indikator) {
+                $nilaiTertinggiIndikator = 0;
+
+                foreach ($bulanRange as $bulan) {
+                    $nilaiData = is_array($nilai->nilai_data) ? $nilai->nilai_data : [];
+                    $semesterKey = "semester_{$this->selectedSemester}";
+                    $aspekKey = "aspek_{$aspek->id}";
+                    $indikatorKey = "indikator_{$indikator->id}";
+                    $bulanKey = "bulan_{$bulan}";
+
+                    $bulanData = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey] ?? [];
+
+                    if (is_array($bulanData) && !empty($bulanData)) {
+                        $mingguNilai = [];
+                        foreach ($bulanData as $mingguData) {
+                            $numericValue = $this->convertNilaiToNumeric($mingguData);
+                            if ($numericValue > 0) {
+                                $mingguNilai[] = $numericValue;
+                            }
+                        }
+                        if (!empty($mingguNilai)) {
+                            $nilaiTertinggiIndikator = max($nilaiTertinggiIndikator, max($mingguNilai));
+                        }
+                    }
+                }
+
+                $nilaiTertinggiAspek = max($nilaiTertinggiAspek, $nilaiTertinggiIndikator);
+            }
+
+            $data[] = $nilaiTertinggiAspek;
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Nilai Tertinggi Perkembangan',
+                    'data' => $data,
+                    'backgroundColor' => ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 205, 86, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)'],
+                    'borderColor' => ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 205, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
+                    'borderWidth' => 1,
                 ],
-                'borderColor' => [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 205, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                'borderWidth' => 1
-            ]
-        ]
-    ];
-}
+            ],
+        ];
+    }
 
     private function convertNilaiToNumeric($nilai)
     {
@@ -253,12 +281,234 @@ private function getAllAspekChart($nilai)
         }
     }
 
+    public function loadNilaiData()
+    {
+        if (!$this->selectedAnak) {
+            $this->nilaiData = [];
+            return;
+        }
+
+        switch ($this->selectedPeriode) {
+            case 'mingguan':
+                $this->nilaiData = $this->getNilaiMingguan();
+                break;
+            case 'bulanan':
+                $this->nilaiData = $this->getNilaiBulanan();
+                break;
+            case 'semesteran':
+                $this->nilaiData = $this->getNilaiSemesteran();
+                break;
+        }
+    }
+
+    private function getNilaiMingguan()
+    {
+        if (!$this->selectedWeek || !$this->selectedTahun || !$this->selectedMonth) {
+            return [];
+        }
+
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)->where('tahun', $this->selectedTahun)->first();
+
+        if (!$nilaiRecord) {
+            return [];
+        }
+
+        $nilaiData = $nilaiRecord->nilai_data ?? [];
+        $catatanData = $nilaiRecord->catatan_data ?? [];
+
+        $semesterKey = $this->selectedMonth >= 7 && $this->selectedMonth <= 12 ? 'semester_ganjil' : 'semester_genap';
+        $bulanKey = "bulan_{$this->selectedMonth}";
+        $mingguKey = "minggu_{$this->selectedWeek}";
+
+        $aspeks = Aspek::with('indikators')->get();
+        $result = [];
+
+        foreach ($aspeks as $aspek) {
+            $aspekKey = "aspek_{$aspek->id}";
+            $aspekNama = $aspek->nama_aspek;
+
+            if (!isset($result[$aspekNama])) {
+                $result[$aspekNama] = collect();
+            }
+
+            foreach ($aspek->indikators as $indikator) {
+                $indikatorKey = "indikator_{$indikator->id}";
+
+                $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
+                $catatan = $catatanData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
+
+                if ($nilai) {
+                    $nilaiObj = new \stdClass();
+                    $nilaiObj->indikator = $indikator;
+                    $nilaiObj->nilai_numerik = $nilai;
+                    $nilaiObj->catatan = $catatan;
+
+                    $result[$aspekNama]->push($nilaiObj);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function getNilaiBulanan()
+    {
+        if (!$this->selectedMonth || !$this->selectedTahun) {
+            return [];
+        }
+
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)->where('tahun', $this->selectedTahun)->first();
+
+        if (!$nilaiRecord) {
+            return [];
+        }
+
+        $nilaiData = $nilaiRecord->nilai_data ?? [];
+
+        $semesterKey = $this->selectedMonth >= 7 && $this->selectedMonth <= 12 ? 'semester_ganjil' : 'semester_genap';
+        $bulanKey = "bulan_{$this->selectedMonth}";
+
+        $aspeks = Aspek::with('indikators')->get();
+        $result = [];
+
+        foreach ($aspeks as $aspek) {
+            $aspekKey = "aspek_{$aspek->id}";
+            $aspekNama = $aspek->nama_aspek;
+
+            if (!isset($result[$aspekNama])) {
+                $result[$aspekNama] = collect();
+            }
+
+            foreach ($aspek->indikators as $indikator) {
+                $indikatorKey = "indikator_{$indikator->id}";
+
+                $mingguData = [];
+                $nilaiTertinggi = 0;
+
+                for ($minggu = 1; $minggu <= 4; $minggu++) {
+                    $mingguKey = "minggu_{$minggu}";
+                    $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? null;
+
+                    if ($nilai) {
+                        $mingguData[$mingguKey] = $nilai;
+                        $nilaiTertinggi = max($nilaiTertinggi, $nilai);
+                    }
+                }
+
+                if (!empty($mingguData)) {
+                    $nilaiObj = new \stdClass();
+                    $nilaiObj->indikator = $indikator;
+                    $nilaiObj->minggu_data = $mingguData;
+                    $nilaiObj->capaian_akhir_bulan = $nilaiTertinggi ?: null;
+
+                    $result[$aspekNama]->push($nilaiObj);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function getNilaiSemesteran()
+    {
+        if (!$this->selectedSemester || !$this->selectedTahun) {
+            return [];
+        }
+
+        $nilaiRecord = Nilai::where('anak_id', $this->selectedAnak)->where('tahun', $this->selectedTahun)->first();
+
+        if (!$nilaiRecord) {
+            return [];
+        }
+
+        $nilaiData = $nilaiRecord->nilai_data ?? [];
+        $semesterKey = "semester_{$this->selectedSemester}";
+
+        $bulanSemester = $this->selectedSemester == 'ganjil' ? [7, 8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6];
+
+        $aspeks = Aspek::with('indikators')->get();
+        $result = [];
+
+        foreach ($aspeks as $aspek) {
+            $aspekKey = "aspek_{$aspek->id}";
+            $aspekNama = $aspek->nama_aspek;
+
+            if (!isset($result[$aspekNama])) {
+                $result[$aspekNama] = collect();
+            }
+
+            foreach ($aspek->indikators as $indikator) {
+                $indikatorKey = "indikator_{$indikator->id}";
+
+                $bulanData = [];
+                $nilaiTertinggi = 0;
+
+                foreach ($bulanSemester as $bulan) {
+                    $bulanKey = "bulan_{$bulan}";
+                    $bulanName = \Carbon\Carbon::create($this->selectedTahun, $bulan, 1)->format('M');
+
+                    $nilaiTertinggiBulan = 0;
+                    for ($minggu = 1; $minggu <= 4; $minggu++) {
+                        $mingguKey = "minggu_{$minggu}";
+                        $nilai = $nilaiData[$semesterKey][$aspekKey][$indikatorKey][$bulanKey][$mingguKey] ?? 0;
+                        $nilaiTertinggiBulan = max($nilaiTertinggiBulan, $nilai);
+                    }
+
+                    if ($nilaiTertinggiBulan > 0) {
+                        $bulanData[$bulanName] = $nilaiTertinggiBulan;
+                        $nilaiTertinggi = max($nilaiTertinggi, $nilaiTertinggiBulan);
+                    }
+                }
+
+                if (!empty($bulanData)) {
+                    $nilaiObj = new \stdClass();
+                    $nilaiObj->indikator = $indikator;
+                    $nilaiObj->bulan_data = $bulanData;
+                    $nilaiObj->capaian_akhir_semester = $nilaiTertinggi ?: null;
+
+                    $result[$aspekNama]->push($nilaiObj);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function getWeekOptions()
+    {
+        $weeks = [];
+        for ($week = 1; $week <= 4; $week++) {
+            $weeks[$week] = "Minggu ke-$week";
+        }
+        return $weeks;
+    }
+
+    public function getMonthOptions()
+    {
+        return [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
+    }
+
     public function render()
     {
         $chartData = $this->getChartData();
 
         return view('livewire.perkembangan', [
             'chartData' => $chartData,
+            'weekOptions' => $this->getWeekOptions(),
+            'monthOptions' => $this->getMonthOptions(),
         ]);
     }
 }

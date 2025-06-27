@@ -137,7 +137,7 @@
                 </div>
 
                 <!-- Statistics Card -->
-                <div class="card shadow-sm mb-4">
+                {{-- <div class="card shadow-sm mb-4">
                     <div class="card-header bg-light">
                         <h5 class="mb-0 text-primary">
                             <i class="fas fa-chart-bar me-2"></i>Statistik Perkembangan
@@ -179,10 +179,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Registration Information Card -->
-                <div class="card shadow-sm">
+                {{-- <div class="card shadow-sm">
                     <div class="card-header bg-light">
                         <h5 class="mb-0 text-primary">
                             <i class="fas fa-info me-2"></i>Informasi Pendaftaran
@@ -204,7 +204,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
             @elseif($anakList->count() == 0)
                 <!-- No Children Registered -->
