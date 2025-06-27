@@ -84,7 +84,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="nisn" class="form-label">NISN (Opsional)</label>
+                                        <label for="nisn" class="form-label">NISN</label>
                                         <input type="number" wire:model="nisn" id="nisn"
                                             class="form-control @error('nisn') is-invalid @enderror">
                                         @error('nisn')
@@ -136,6 +136,15 @@
                                         <input type="text" wire:model="ibu" id="ibu"
                                             class="form-control @error('ibu') is-invalid @enderror">
                                         @error('ibu')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="wali" class="form-label">Nama Wali (Opsional)</label>
+                                        <input type="text" wire:model="wali" id="wali"
+                                            class="form-control @error('wali') is-invalid @enderror">
+                                        @error('wali')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

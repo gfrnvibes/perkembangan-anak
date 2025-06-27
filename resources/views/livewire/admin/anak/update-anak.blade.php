@@ -49,6 +49,15 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label for="phone_number" class="form-label">No. WhatsApp</label>
+                                        <input type="number" wire:model="phone_number" id="phone_number"
+                                            class="form-control @error('phone_number') is-invalid @enderror" >
+                                        @error('phone_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
                                         <input type="text" wire:model="nama_lengkap" id="nama_lengkap"
                                             class="form-control @error('nama_lengkap') is-invalid @enderror">
@@ -103,7 +112,8 @@
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">TTL</span>
                                         <input type="text" wire:model="tempat_lahir" id="tempat_lahir"
-                                            class="form-control @error('tempat_lahir') is-invalid @enderror" placeholder="Tempat Lahir">
+                                            class="form-control @error('tempat_lahir') is-invalid @enderror"
+                                            placeholder="Tempat Lahir">
                                         @error('tempat_lahir')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -133,6 +143,15 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label for="wali" class="form-label">Nama Wali (Opsional)</label>
+                                        <input type="text" wire:model="wali" id="wali"
+                                            class="form-control @error('wali') is-invalid @enderror">
+                                        @error('wali')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label for="alamat_lengkap" class="form-label">Alamat Lengkap</label>
                                         <textarea wire:model="alamat_lengkap" id="alamat_lengkap"
                                             class="form-control @error('alamat_lengkap') is-invalid @enderror" rows="4"></textarea>
@@ -142,10 +161,11 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="pas_foto" class="form-label">Pas Foto</label>
-                                        @if($existing_foto)
+                                        @if ($existing_foto)
                                             <div class="mb-2">
-                                                <img src="{{ Storage::url($existing_foto) }}" alt="Foto saat ini" 
-                                                     class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                                <img src="{{ Storage::url($existing_foto) }}" alt="Foto saat ini"
+                                                    class="img-thumbnail"
+                                                    style="max-width: 150px; max-height: 150px;">
                                                 <p class="text-muted small mt-1">Foto saat ini</p>
                                             </div>
                                         @endif
@@ -155,11 +175,12 @@
                                         @error('pas_foto')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        
-                                        @if($pas_foto)
+
+                                        @if ($pas_foto)
                                             <div class="mt-2">
-                                                <img src="{{ $pas_foto->temporaryUrl() }}" alt="Preview foto baru" 
-                                                     class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                                <img src="{{ $pas_foto->temporaryUrl() }}" alt="Preview foto baru"
+                                                    class="img-thumbnail"
+                                                    style="max-width: 150px; max-height: 150px;">
                                                 <p class="text-muted small mt-1">Preview foto baru</p>
                                             </div>
                                         @endif
@@ -182,4 +203,3 @@
         </div>
     </div>
 </div>
-

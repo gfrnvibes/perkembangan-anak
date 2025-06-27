@@ -52,7 +52,7 @@ class CreateAnak extends Component
             'tanggal_lahir' => 'required|date',
             'ayah' => 'nullable|string|max:255',
             'ibu' => 'nullable|string|max:255',
-            // 'wali' => 'nullable|string|max:255', 
+            'wali' => 'nullable|string|max:255', 
             'alamat_lengkap' => 'required|string',
             'phone_number' => 'nullable|string|max:15', 
             'pas_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -76,7 +76,7 @@ class CreateAnak extends Component
             'pas_foto.image' => 'File harus berupa gambar',
             'pas_foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
             'pas_foto.max' => 'Ukuran gambar maksimal 2MB',
-            // 'wali.max' => 'Nama wali maksimal 255 karakter',
+            'wali.max' => 'Nama wali maksimal 255 karakter',
             'phone_number.max' => 'Nomor telepon maksimal 15 karakter',
         ];
     }

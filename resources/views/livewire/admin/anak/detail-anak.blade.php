@@ -87,6 +87,10 @@
                                             <td>: {{ $anak->orangTua->email ?? '-' }}</td>
                                         </tr>
                                         <tr>
+                                            <td class="fw-bold">Kontak Orang Tua</td>
+                                            <td>: {{ $anak->phone_number ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
                                             <td class="fw-bold">Nama Ayah</td>
                                             <td>: {{ $anak->ayah }}</td>
                                         </tr>

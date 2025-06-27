@@ -7,7 +7,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table">
+                <table class="table table-bordered table-striped">
                     <thead class="table-light">
                         <tr class="text-center align-middle">
                             <th>No.</th>
@@ -23,30 +23,34 @@
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td> {{ $item->ayah ?? $item->ibu ?? $item->wali }}
-                                    {{-- Wali dari Nama Ayah.
-                                    Jika ayah tidak ada, maka walinya dari Nama Ibu.
-                                    Jika keduanya tidak ada, maka dari nama Wali --}}
                                 </td>
                                 <td>
                                    {{ $item->nama_lengkap ?? 'Tidak ada anak' }}
-                                    {{-- Ambil nama anak yang sesuai dengan Nama Orang Tua nya --}}
                                 </td>
                                 <td>
-                                    {{-- Tampilkan Email Orang Tua --}}
-                                    {{-- Tampilkan Button untuk menghubungi orang tua lewat Email --}}
-                                    {{-- Jika email tidak ada, tampilkan strip (-) --}}
-                                    {{ $item->orangTua?->email }}
-                                                                    
+                                    @if ($item->orangTua?->email)
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>{{ $item->orangTua->email }}</span>
+                                            <button type="button" class="btn btn-link p-0" title="Salin Email" onclick="navigator.clipboard.writeText('{{ $item->orangTua->email }}')">
+                                                <i class="uil-copy"></i>
+                                            </button>
+                                            <a href="https://mail.google.com/mail/u/0/#inbox?compose=new&to={{ $item->orangTua->email }}" target="_blank" class="btn btn-link p-0" title="Kirim Email via Gmail">
+                                                <i class="uil-envelope"></i>
+                                            </a>
+                                        </div>
+                                    @else
+                                        -
+                                    @endif
+
                                 </td>
                                 <td>
-                                    {{-- Tampilkan WhatsApp Orang Tua --}}
-                                    {{-- Tampilkan Button untuk menghubungi orang tua lewat WhatsApp.
-                                        Jika nomor dimulai dengan 0, maka ganti dengan +62.
-                                    --}}
-                                    {{-- Jika WhatsApp tidak ada, tampilkan strip (-) --}}
-                                    @if ($item->orangTua?->no_wa)
-                                        <a href="https://wa.me/{{ $item->orangTua?->no_wa }}" target="_blank">
-                                            {{ $item->orangTua?->no_wa }}
+                                    @if ($item->phone_number)
+                                        @php
+                                            $waNumber = preg_replace('/^0/', '+62', $item->phone_number);
+                                        @endphp
+                                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $waNumber) }}" target="_blank">
+                                            <i class="uil-whatsapp"></i>
+                                            <span>{{ $item->phone_number }}</span>
                                         </a>
                                     @else
                                         -
@@ -55,7 +59,7 @@
                                 <td class="text-center">
                                     {{-- Detail menuju ke livewire/admin/anak/detai-anak.php sesuai id anak --}}
                                     <a class="btn btn-primary btn-sm" href="{{ route('detail', $item->nama_lengkap) }}">
-                                        <i class="uil-eye"></i> Detail
+                                        <i class="uil-eye"></i> Detail Anak
                                     </a>
                                 </td>
                             </tr>

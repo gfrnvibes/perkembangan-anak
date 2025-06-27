@@ -11,7 +11,7 @@ class Anak extends Model
 
     // protected $table = 'anak';
 
-    protected $fillable = ['user_id', 'email', 'nama_lengkap', 'nama_panggilan', 'nomor_induk', 'nisn', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'ayah', 'ibu', 'wali', 'alamat_lengkap', 'pas_foto'];
+    protected $fillable = ['user_id', 'email', 'nama_lengkap', 'nama_panggilan', 'nomor_induk', 'nisn', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'ayah', 'ibu', 'wali', 'alamat_lengkap', 'pas_foto', 'phone_number'];
 
     // Perbaiki nama relationship - gunakan 'user' bukan 'users'
     public function user()

@@ -18,7 +18,7 @@ class UpdateAnak extends Component
 
     public $anakId;
     public $anak;
-    
+
     // Form fields
     public $email;
     public $user_id;
@@ -31,6 +31,8 @@ class UpdateAnak extends Component
     public $tanggal_lahir;
     public $ayah;
     public $ibu;
+    public $wali;
+    public $phone_number;
     public $alamat_lengkap;
     public $pas_foto;
     public $existing_foto;
@@ -38,12 +40,10 @@ class UpdateAnak extends Component
     public function mount($nama_lengkap)
     {
         // Find anak by ID or nama_lengkap
-        $this->anak = Anak::where('id', $nama_lengkap)
-                          ->orWhere('nama_lengkap', $nama_lengkap)
-                          ->firstOrFail();
-        
+        $this->anak = Anak::where('id', $nama_lengkap)->orWhere('nama_lengkap', $nama_lengkap)->firstOrFail();
+
         $this->anakId = $this->anak->id;
-        
+
         // Populate form fields
         $this->email = $this->anak->orangTua?->email ?? '';
         $this->user_id = $this->anak->user_id;
@@ -56,6 +56,8 @@ class UpdateAnak extends Component
         $this->tanggal_lahir = $this->anak->tanggal_lahir;
         $this->ayah = $this->anak->ayah;
         $this->ibu = $this->anak->ibu;
+        $this->wali = $this->anak->wali;
+        $this->phone_number = $this->anak->phone_number;
         $this->alamat_lengkap = $this->anak->alamat_lengkap;
         $this->existing_foto = $this->anak->pas_foto;
     }
@@ -75,6 +77,8 @@ class UpdateAnak extends Component
             'ibu' => 'nullable|string|max:255',
             'alamat_lengkap' => 'required|string',
             'pas_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'wali' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:15',
         ];
     }
 
@@ -95,6 +99,7 @@ class UpdateAnak extends Component
             'pas_foto.image' => 'File harus berupa gambar',
             'pas_foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
             'pas_foto.max' => 'Ukuran gambar maksimal 2MB',
+            'phone_number' => 'nullable|string|max:15',
         ];
     }
 
@@ -136,10 +141,9 @@ class UpdateAnak extends Component
             $this->anak->update($validatedData);
 
             session()->flash('message', 'Data anak berhasil diperbarui!');
-            
+
             // Redirect ke halaman daftar anak
             return redirect()->route('daftar-anak');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
